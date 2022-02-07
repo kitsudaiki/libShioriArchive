@@ -41,6 +41,10 @@ Kitsunemimi::DataBuffer* getData(const std::string &token,
                                  const std::string &uuid,
                                  Kitsunemimi::ErrorContainer &error);
 
+bool sendResults(const std::string &uuid,
+                 const Kitsunemimi::DataArray &results,
+                 Kitsunemimi::ErrorContainer &error);
+
 bool getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
                            const std::string &dataSetUuid,
                            const std::string &token,
