@@ -31,11 +31,13 @@ namespace Sagiri
 {
 
 /**
- * @brief getData
- * @param token
- * @param uuid
- * @param error
- * @return
+ * @brief get data-set payload from sagiri
+ *
+ * @param token token for request
+ * @param uuid uuid of the data-set to download
+ * @param error reference for error-output
+ *
+ * @return data-buffer with data if successful, else nullptr
  */
 Kitsunemimi::DataBuffer*
 getData(const std::string &token,
@@ -72,9 +74,37 @@ getData(const std::string &token,
     }
 
     const std::string location = jsonItem.get("location").getString();
-    const std::string message = "{\"location\":\"" + location + "\"}";
+    const std::string message = "{\"message_type\":\"data_set_request\","
+                                "\"location\":\"" + location + "\"}";
 
-    return  msg->sendGenericMessage("sagiri", message.c_str(), message.size(), error);
+    return msg->sendGenericMessage("sagiri", message.c_str(), message.size(), error);
+}
+
+/**
+ * @brief send list with request-results to sagiri
+ *
+ * @param uuid uuid of the request-task
+ * @param results data-array with results
+ * @param error reference for error-output
+ *
+ * @return true, if successful, else false
+ */
+bool
+sendResults(const std::string &uuid,
+            const Kitsunemimi::DataArray &results,
+            Kitsunemimi::ErrorContainer &error)
+{
+    Kitsunemimi::Hanami::HanamiMessaging* msg = Kitsunemimi::Hanami::HanamiMessaging::getInstance();
+    const std::string message = "{\"message_type\":\"result_push\","
+                                "\"uuid\":\"" + uuid + "\","
+                                "\"result\":" + results.toString() + "}";
+
+    Kitsunemimi::DataBuffer* ret = msg->sendGenericMessage("sagiri",
+                                                           message.c_str(),
+                                                           message.size(),
+                                                           error);
+    delete ret;
+    return true;
 }
 
 /**
