@@ -23,6 +23,7 @@
 #include <libSagiriArchive/sagiri_send.h>
 
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
+#include <libKitsunemimiCrypto/common.h>
 
 #include <libKitsunemimiHanamiCommon/structs.h>
 #include <libKitsunemimiHanamiMessaging/hanami_messaging.h>
@@ -151,6 +152,41 @@ getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
     }
 
     return true;
+}
+
+/**
+ * @brief send error-message to sagiri
+ *
+ * @param userUuid uuid of the user where the error belongs to
+ * @param errorMessage error-message to send to sagiri
+ */
+void
+sendErrorMessage(const std::string &userUuid,
+                 const std::string &errorMessage)
+{
+    Kitsunemimi::ErrorContainer error;
+    std::string base64Error;
+    Kitsunemimi::Crypto::encodeBase64(base64Error, errorMessage.c_str(), errorMessage.size());
+
+    // create message
+    Kitsunemimi::Hanami::HanamiMessaging* msg = Kitsunemimi::Hanami::HanamiMessaging::getInstance();
+    const std::string message = "{\"message_type\":\"error_log\","
+                                "\"user_uuid\" : \"" + userUuid + "\","
+                                "\"message\":\"" + base64Error + "\"}";
+
+    // send
+    Kitsunemimi::DataBuffer* ret = msg->sendGenericMessage("sagiri",
+                                                           message.c_str(),
+                                                           message.size(),
+                                                           error);
+
+    if(ret == nullptr)
+    {
+        LOG_ERROR(error);
+        return;
+    }
+
+    delete ret;
 }
 
 }

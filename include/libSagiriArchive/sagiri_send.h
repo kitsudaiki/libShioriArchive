@@ -49,6 +49,9 @@ bool getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
                            const std::string &dataSetUuid,
                            const std::string &token,
                            Kitsunemimi::ErrorContainer &error);
+
+void sendErrorMessage(const std::string &userUuid,
+                      const std::string &errorMessage);
 }
 
 #endif // KITSUNEMIMI_HANAMI_SAGIRI_SEND_H
