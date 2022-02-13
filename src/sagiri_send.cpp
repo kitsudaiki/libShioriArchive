@@ -78,7 +78,7 @@ getData(const std::string &token,
     const std::string message = "{\"message_type\":\"data_set_request\","
                                 "\"location\":\"" + location + "\"}";
 
-    return msg->sendGenericMessage("sagiri", message.c_str(), message.size(), error);
+    return msg->sendGenericRequest("sagiri", message.c_str(), message.size(), error);
 }
 
 /**
@@ -100,7 +100,7 @@ sendResults(const std::string &uuid,
                                 "\"uuid\":\"" + uuid + "\","
                                 "\"result\":" + results.toString() + "}";
 
-    Kitsunemimi::DataBuffer* ret = msg->sendGenericMessage("sagiri",
+    Kitsunemimi::DataBuffer* ret = msg->sendGenericRequest("sagiri",
                                                            message.c_str(),
                                                            message.size(),
                                                            error);
@@ -175,18 +175,7 @@ sendErrorMessage(const std::string &userUuid,
                                 "\"message\":\"" + base64Error + "\"}";
 
     // send
-    Kitsunemimi::DataBuffer* ret = msg->sendGenericMessage("sagiri",
-                                                           message.c_str(),
-                                                           message.size(),
-                                                           error);
-
-    if(ret == nullptr)
-    {
-        LOG_ERROR(error);
-        return;
-    }
-
-    delete ret;
+    msg->sendGenericMessage("sagiri", message.c_str(), message.size(), error);
 }
 
 }
