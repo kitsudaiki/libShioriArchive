@@ -27,6 +27,7 @@
 
 #include <libKitsunemimiHanamiCommon/structs.h>
 #include <libKitsunemimiHanamiMessaging/hanami_messaging.h>
+#include <libKitsunemimiHanamiMessaging/hanami_messaging_client.h>
 
 namespace Sagiri
 {
@@ -56,8 +57,12 @@ getData(const std::string &token,
                           ",\"uuid\":\"" + uuid + "\""
                           "}";
 
+    if(msg->sagiriClient == nullptr) {
+        return nullptr;
+    }
+
     // send request to sagiri
-    if(msg->triggerSakuraFile("sagiri", response, request, error) == false) {
+    if(msg->sagiriClient->triggerSakuraFile(response, request, error) == false) {
         return nullptr;
     }
 
@@ -78,7 +83,7 @@ getData(const std::string &token,
     const std::string message = "{\"message_type\":\"data_set_request\","
                                 "\"location\":\"" + location + "\"}";
 
-    return msg->sendGenericRequest("sagiri", message.c_str(), message.size(), error);
+    return msg->sagiriClient->sendGenericRequest(message.c_str(), message.size(), error);
 }
 
 /**
@@ -100,10 +105,13 @@ sendResults(const std::string &uuid,
                                 "\"uuid\":\"" + uuid + "\","
                                 "\"result\":" + results.toString() + "}";
 
-    Kitsunemimi::DataBuffer* ret = msg->sendGenericRequest("sagiri",
-                                                           message.c_str(),
-                                                           message.size(),
-                                                           error);
+    if(msg->sagiriClient == nullptr) {
+        return false;
+    }
+
+    Kitsunemimi::DataBuffer* ret = msg->sagiriClient->sendGenericRequest(message.c_str(),
+                                                                         message.size(),
+                                                                         error);
     delete ret;
     return true;
 }
@@ -134,8 +142,12 @@ getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
     request.inputValues = "{ \"uuid\" : \"" + dataSetUuid + "\","
                           "\"token\":\"" + token + "\"}";
 
+    if(msg->sagiriClient == nullptr) {
+        return false;
+    }
+
     // send request to the target
-    if(msg->triggerSakuraFile("sagiri", response, request, error) == false) {
+    if(msg->sagiriClient->triggerSakuraFile(response, request, error) == false) {
         return false;
     }
 
@@ -174,8 +186,12 @@ sendErrorMessage(const std::string &userUuid,
                                 "\"user_uuid\" : \"" + userUuid + "\","
                                 "\"message\":\"" + base64Error + "\"}";
 
+    if(msg->sagiriClient == nullptr) {
+        return;
+    }
+
     // send
-    msg->sendGenericMessage("sagiri", message.c_str(), message.size(), error);
+    msg->sagiriClient->sendGenericMessage(message.c_str(), message.size(), error);
 }
 
 }
