@@ -27,6 +27,8 @@
 
 #include <libKitsunemimiCommon/logger.h>
 
+#include <libKitsunemimiHanamiCommon/enums.h>
+
 namespace Kitsunemimi {
 struct DataBuffer;
 namespace Json {
@@ -52,6 +54,11 @@ bool getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
 
 void sendErrorMessage(const std::string &userUuid,
                       const std::string &errorMessage);
+
+void sendAuditMessage(const std::string &targetComponent,
+                      const std::string &targetEndpoint,
+                      const std::string &userUuid,
+                      const Kitsunemimi::Hanami::HttpRequestType requestType);
 }
 
 #endif // KITSUNEMIMI_HANAMI_SAGIRI_SEND_H

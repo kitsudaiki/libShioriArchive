@@ -25,9 +25,14 @@
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
 #include <libKitsunemimiCrypto/common.h>
 
+#include <libKitsunemimiHanamiCommon/component_support.h>
 #include <libKitsunemimiHanamiCommon/structs.h>
 #include <libKitsunemimiHanamiMessaging/hanami_messaging.h>
 #include <libKitsunemimiHanamiMessaging/hanami_messaging_client.h>
+
+using Kitsunemimi::Hanami::HanamiMessaging;
+using Kitsunemimi::Hanami::HanamiMessagingClient;
+using Kitsunemimi::Hanami::SupportedComponents;
 
 namespace Sagiri
 {
@@ -192,6 +197,63 @@ sendErrorMessage(const std::string &userUuid,
 
     // send
     msg->sagiriClient->sendGenericMessage(message.c_str(), message.size(), error);
+}
+
+/**
+ * @brief send error-message to sagiri
+ *
+ * @param context context context-object to log
+ * @param inputValues inputValues input-values of the request to log
+ */
+void
+sendAuditMessage(const std::string &targetComponent,
+                 const std::string &targetEndpoint,
+                 const std::string &userUuid,
+                 const Kitsunemimi::Hanami::HttpRequestType requestType)
+{
+    // check if sagiri is supported
+    if(SupportedComponents::getInstance()->support[Kitsunemimi::Hanami::SAGIRI] == false) {
+        return;
+    }
+
+    // convert http-type into string
+    std::string httpType = "GET";
+    if(requestType == Kitsunemimi::Hanami::DELETE_TYPE) {
+        httpType = "DELETE";
+    }
+    if(requestType == Kitsunemimi::Hanami::GET_TYPE) {
+        httpType = "GET";
+    }
+    if(requestType == Kitsunemimi::Hanami::HEAD_TYPE) {
+        httpType = "HEAD";
+    }
+    if(requestType == Kitsunemimi::Hanami::POST_TYPE) {
+        httpType = "POST";
+    }
+    if(requestType == Kitsunemimi::Hanami::PUT_TYPE) {
+        httpType = "PUT";
+    }
+
+    // create message
+    const std::string message = "{\"message_type\":\"audit_log\","
+                                "\"component\" : \"" + targetComponent + "\","
+                                "\"endpoint\" : \"" + targetEndpoint + "\","
+                                "\"type\" : \"" + httpType + "\","
+                                "\"user_uuid\" : \"" + userUuid + "\"}";
+
+    LOG_DEBUG("process uri: \'" + targetEndpoint + "\' with type '" + httpType + "'");
+
+    // send
+    Kitsunemimi::ErrorContainer error;
+    HanamiMessaging* msg = HanamiMessaging::getInstance();
+
+    if(msg->sagiriClient == nullptr) {
+        return;
+    }
+
+    if(msg->sagiriClient->sendGenericMessage(message.c_str(), message.size(), error) == false) {
+        LOG_ERROR(error);
+    }
 }
 
 }
