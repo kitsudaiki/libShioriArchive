@@ -41,6 +41,7 @@ namespace Sagiri
 
 Kitsunemimi::DataBuffer* getData(const std::string &token,
                                  const std::string &uuid,
+                                 const std::string &columnName,
                                  Kitsunemimi::ErrorContainer &error);
 
 bool sendResults(const std::string &uuid,

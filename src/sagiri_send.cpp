@@ -49,6 +49,7 @@ namespace Sagiri
 Kitsunemimi::DataBuffer*
 getData(const std::string &token,
         const std::string &uuid,
+        const std::string &columnName,
         Kitsunemimi::ErrorContainer &error)
 {
     Kitsunemimi::Hanami::ResponseMessage response;
@@ -86,7 +87,9 @@ getData(const std::string &token,
 
     const std::string location = jsonItem.get("location").getString();
     const std::string message = "{\"message_type\":\"data_set_request\","
-                                "\"location\":\"" + location + "\"}";
+                                "\"location\":\"" + location + "\","
+                                "\"column_name\":\"" + columnName + "\""
+                                "}";
 
     return msg->sagiriClient->sendGenericRequest(message.c_str(), message.size(), error);
 }
