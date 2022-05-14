@@ -53,9 +53,6 @@ bool getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
                            const std::string &token,
                            Kitsunemimi::ErrorContainer &error);
 
-void sendErrorMessage(const std::string &userUuid,
-                      const std::string &errorMessage);
-
 void sendAuditMessage(const std::string &targetComponent,
                       const std::string &targetEndpoint,
                       const std::string &userUuid,

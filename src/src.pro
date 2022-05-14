@@ -76,7 +76,9 @@ INCLUDEPATH += $$PWD \
                $$PWD/../include
 
 HEADERS += \
-    ../include/libSagiriArchive/sagiri_send.h
+    ../include/libSagiriArchive/sagiri_send.h \
+    ../include/libSagiriArchive/sagiri_messages.h
 
 SOURCES += \
+    sagiri_messages.cpp \
     sagiri_send.cpp

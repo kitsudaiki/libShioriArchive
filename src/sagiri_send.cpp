@@ -21,6 +21,7 @@
  */
 
 #include <libSagiriArchive/sagiri_send.h>
+#include <libSagiriArchive/sagiri_messages.h>
 
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
 #include <libKitsunemimiCrypto/common.h>
@@ -53,7 +54,7 @@ getData(const std::string &token,
         Kitsunemimi::ErrorContainer &error)
 {
     Kitsunemimi::Hanami::ResponseMessage response;
-    Kitsunemimi::Hanami::HanamiMessaging* msg = Kitsunemimi::Hanami::HanamiMessaging::getInstance();
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
 
     // build request to get train-data from sagiri
     Kitsunemimi::Hanami::RequestMessage request;
@@ -63,12 +64,12 @@ getData(const std::string &token,
                           ",\"uuid\":\"" + uuid + "\""
                           "}";
 
-    if(msg->sagiriClient == nullptr) {
+    if(client == nullptr) {
         return nullptr;
     }
 
     // send request to sagiri
-    if(msg->sagiriClient->triggerSakuraFile(response, request, error) == false) {
+    if(client->triggerSakuraFile(response, request, error) == false) {
         return nullptr;
     }
 
@@ -85,13 +86,14 @@ getData(const std::string &token,
         return nullptr;
     }
 
-    const std::string location = jsonItem.get("location").getString();
-    const std::string message = "{\"message_type\":\"data_set_request\","
-                                "\"location\":\"" + location + "\","
-                                "\"column_name\":\"" + columnName + "\""
-                                "}";
+    // create real request
+    DatasetRequest_Message msg;
+    msg.location = jsonItem.get("location").getString();
+    msg.columnName = columnName;
+    DataBuffer msgBlob;
+    msg.createBlob(msgBlob);
 
-    return msg->sagiriClient->sendGenericRequest(message.c_str(), message.size(), error);
+    return client->sendGenericRequest(msgBlob.data, msgBlob.usedBufferSize, error);
 }
 
 /**
@@ -108,18 +110,20 @@ sendResults(const std::string &uuid,
             const Kitsunemimi::DataArray &results,
             Kitsunemimi::ErrorContainer &error)
 {
-    Kitsunemimi::Hanami::HanamiMessaging* msg = Kitsunemimi::Hanami::HanamiMessaging::getInstance();
-    const std::string message = "{\"message_type\":\"result_push\","
-                                "\"uuid\":\"" + uuid + "\","
-                                "\"result\":" + results.toString() + "}";
-
-    if(msg->sagiriClient == nullptr) {
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    if(client == nullptr) {
         return false;
     }
 
-    Kitsunemimi::DataBuffer* ret = msg->sagiriClient->sendGenericRequest(message.c_str(),
-                                                                         message.size(),
-                                                                         error);
+    ResultPush_Message msg;
+    msg.uuid = uuid;
+    msg.results = results.toString();
+    DataBuffer msgBlob;
+    msg.createBlob(msgBlob);
+
+    Kitsunemimi::DataBuffer* ret = client->sendGenericRequest(msgBlob.data,
+                                                              msgBlob.usedBufferSize,
+                                                              error);
     delete ret;
     return true;
 }
@@ -140,22 +144,22 @@ getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
                       const std::string &token,
                       Kitsunemimi::ErrorContainer &error)
 {
-    Kitsunemimi::Hanami::HanamiMessaging* msg = Kitsunemimi::Hanami::HanamiMessaging::getInstance();
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    if(client == nullptr) {
+        return false;
+    }
+
     Kitsunemimi::Hanami::ResponseMessage response;
 
     // create request for remote-calls
     Kitsunemimi::Hanami::RequestMessage request;
     request.id = "v1/data_set";
     request.httpType = Kitsunemimi::Hanami::GET_TYPE;
-    request.inputValues = "{ \"uuid\" : \"" + dataSetUuid + "\","
+    request.inputValues = "{\"uuid\" : \"" + dataSetUuid + "\","
                           "\"token\":\"" + token + "\"}";
 
-    if(msg->sagiriClient == nullptr) {
-        return false;
-    }
-
     // send request to the target
-    if(msg->sagiriClient->triggerSakuraFile(response, request, error) == false) {
+    if(client->triggerSakuraFile(response, request, error) == false) {
         return false;
     }
 
@@ -184,22 +188,21 @@ void
 sendErrorMessage(const std::string &userUuid,
                  const std::string &errorMessage)
 {
-    Kitsunemimi::ErrorContainer error;
-    std::string base64Error;
-    Kitsunemimi::Crypto::encodeBase64(base64Error, errorMessage.c_str(), errorMessage.size());
-
     // create message
-    Kitsunemimi::Hanami::HanamiMessaging* msg = Kitsunemimi::Hanami::HanamiMessaging::getInstance();
-    const std::string message = "{\"message_type\":\"error_log\","
-                                "\"user_uuid\" : \"" + userUuid + "\","
-                                "\"message\":\"" + base64Error + "\"}";
-
-    if(msg->sagiriClient == nullptr) {
+    Kitsunemimi::ErrorContainer error;
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    if(client == nullptr) {
         return;
     }
 
+    Kitsunemimi::Hanami::ErrorLog_Message msg;
+    msg.userUuid = userUuid;
+    msg.errorMsg = errorMessage;
+    DataBuffer msgBlob;
+    msg.createBlob(msgBlob);
+
     // send
-    msg->sagiriClient->sendGenericMessage(message.c_str(), message.size(), error);
+    client->sendGenericMessage(msgBlob.data, msgBlob.usedBufferSize, error);
 }
 
 /**
@@ -238,23 +241,24 @@ sendAuditMessage(const std::string &targetComponent,
     }
 
     // create message
-    const std::string message = "{\"message_type\":\"audit_log\","
-                                "\"component\" : \"" + targetComponent + "\","
-                                "\"endpoint\" : \"" + targetEndpoint + "\","
-                                "\"type\" : \"" + httpType + "\","
-                                "\"user_uuid\" : \"" + userUuid + "\"}";
-
     LOG_DEBUG("process uri: \'" + targetEndpoint + "\' with type '" + httpType + "'");
 
     // send
     Kitsunemimi::ErrorContainer error;
-    HanamiMessaging* msg = HanamiMessaging::getInstance();
-
-    if(msg->sagiriClient == nullptr) {
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    if(client == nullptr) {
         return;
     }
 
-    if(msg->sagiriClient->sendGenericMessage(message.c_str(), message.size(), error) == false) {
+    AuditLog_Message msg;
+    msg.userUuid = userUuid;
+    msg.type = httpType;
+    msg.component = targetComponent;
+    msg.endpoint = targetEndpoint;
+    DataBuffer msgBlob;
+    msg.createBlob(msgBlob);
+
+    if(client->sendGenericMessage(msgBlob.data, msgBlob.usedBufferSize, error) == false) {
         LOG_ERROR(error);
     }
 }
