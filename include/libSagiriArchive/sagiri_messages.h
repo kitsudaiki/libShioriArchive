@@ -34,24 +34,40 @@ namespace Sagiri
 enum SagiriMessageTypes
 {
     UNDEFINED_MESSAGE_TYPE = 0,
-    CLUSTER_SNAPSHOT_MESSAGE_TYPE = 5,
-    DATASET_REQUEST_MESSAGE_TYPE = 2,
-    RESULT_PUSH_MESSAGE_TYPE = 3,
-    AUDIT_LOG_MESSAGE_TYPE = 4,
+    DATASET_REQUEST_MESSAGE_TYPE = 1,
+    RESULT_PUSH_MESSAGE_TYPE = 2,
+    AUDIT_LOG_MESSAGE_TYPE = 3,
+    CLUSTER_SNAPSHOT_PUSH_MESSAGE_TYPE = 4,
+    CLUSTER_SNAPSHOT_PULL_MESSAGE_TYPE = 5,
 };
 
 //==================================================================================================
 
-class ClusterSnapshot_Message
+class ClusterSnapshotPush_Message
         : public HanamiMessage
 {
 public:
-    ClusterSnapshot_Message();
-    ~ClusterSnapshot_Message();
+    ClusterSnapshotPush_Message();
+    ~ClusterSnapshotPush_Message();
 
     std::string uuid = "";
     std::string fileUuid = "";
     DataBuffer data;
+
+    bool read(const void* data, const uint64_t dataSize);
+    void createBlob(DataBuffer &result);
+};
+
+//==================================================================================================
+
+class ClusterSnapshotPull_Message
+        : public HanamiMessage
+{
+public:
+    ClusterSnapshotPull_Message();
+    ~ClusterSnapshotPull_Message();
+
+    std::string uuid = "";
 
     bool read(const void* data, const uint64_t dataSize);
     void createBlob(DataBuffer &result);

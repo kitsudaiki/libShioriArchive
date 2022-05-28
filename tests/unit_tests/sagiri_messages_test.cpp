@@ -40,7 +40,7 @@ HanamiMessages_Test::HanamiMessages_Test()
 void
 HanamiMessages_Test::clusterSnapshot_test()
 {
-    ClusterSnapshot_Message sourceMessage;
+    ClusterSnapshotPush_Message sourceMessage;
 
     sourceMessage.uuid = "asdf";
     sourceMessage.fileUuid = "poi";
@@ -49,7 +49,7 @@ HanamiMessages_Test::clusterSnapshot_test()
     Kitsunemimi::DataBuffer result;
     sourceMessage.createBlob(result);
 
-    ClusterSnapshot_Message targetMessage;
+    ClusterSnapshotPush_Message targetMessage;
     TEST_EQUAL(targetMessage.read(result.data, result.usedBufferSize), true);
 
     TEST_EQUAL(targetMessage.uuid, sourceMessage.uuid);

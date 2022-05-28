@@ -30,16 +30,16 @@ namespace Sagiri
 /**
  * @brief constructor
  */
-ClusterSnapshot_Message::ClusterSnapshot_Message()
+ClusterSnapshotPush_Message::ClusterSnapshotPush_Message()
     : HanamiMessage()
 {
-    m_type = CLUSTER_SNAPSHOT_MESSAGE_TYPE;
+    m_type = CLUSTER_SNAPSHOT_PUSH_MESSAGE_TYPE;
 }
 
 /**
  * @brief destructor
  */
-ClusterSnapshot_Message::~ClusterSnapshot_Message() {}
+ClusterSnapshotPush_Message::~ClusterSnapshotPush_Message() {}
 
 /**
  * @brief read message from bytes
@@ -50,7 +50,7 @@ ClusterSnapshot_Message::~ClusterSnapshot_Message() {}
  * @return false, if message is broken, else true
  */
 bool
-ClusterSnapshot_Message::read(const void* data, const uint64_t dataSize)
+ClusterSnapshotPush_Message::read(const void* data, const uint64_t dataSize)
 {
     if(initRead(data, dataSize) == false) {
         return false;
@@ -75,7 +75,7 @@ ClusterSnapshot_Message::read(const void* data, const uint64_t dataSize)
  * @param result data-buffer for the resulting binary
  */
 void
-ClusterSnapshot_Message::createBlob(DataBuffer &result)
+ClusterSnapshotPush_Message::createBlob(DataBuffer &result)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
                                   + 3 * sizeof(Entry)
@@ -87,6 +87,59 @@ ClusterSnapshot_Message::createBlob(DataBuffer &result)
     appendString(result, uuid);
     appendString(result, fileUuid);
     appendData(result, data);
+}
+
+//==================================================================================================
+
+/**
+ * @brief constructor
+ */
+ClusterSnapshotPull_Message::ClusterSnapshotPull_Message()
+{
+    m_type = CLUSTER_SNAPSHOT_PULL_MESSAGE_TYPE;
+}
+
+/**
+ * @brief destructor
+ */
+ClusterSnapshotPull_Message::~ClusterSnapshotPull_Message() {}
+
+/**
+ * @brief read message from bytes
+ *
+ * @param data data-pointer to read
+ * @param dataSize number of bytes to read
+ *
+ * @return false, if message is broken, else true
+ */
+bool
+ClusterSnapshotPull_Message::read(const void* data, const uint64_t dataSize)
+{
+    if(initRead(data, dataSize) == false) {
+        return false;
+    }
+
+    if(readString(data, uuid) == false) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief convert message content into binary to send
+ *
+ * @param result data-buffer for the resulting binary
+ */
+void
+ClusterSnapshotPull_Message::createBlob(Kitsunemimi::DataBuffer &result)
+{
+    const uint64_t totalMsgSize = sizeof(MessageHeader)
+                                  + 1 * sizeof(Entry)
+                                  + uuid.size();
+
+    initBlob(result, totalMsgSize);
+    appendString(result, uuid);
 }
 
 //==================================================================================================

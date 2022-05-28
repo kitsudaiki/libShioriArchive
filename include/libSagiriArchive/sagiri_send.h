@@ -57,6 +57,13 @@ void sendAuditMessage(const std::string &targetComponent,
                       const std::string &targetEndpoint,
                       const std::string &userUuid,
                       const Kitsunemimi::Hanami::HttpRequestType requestType);
+
+bool sendClusterSnapshotPushFinish(const std::string &uuid,
+                                   const std::string &fileUuid,
+                                   Kitsunemimi::ErrorContainer &error);
+
+bool getClusterSnapshot(const std::string &uuid,
+                        Kitsunemimi::ErrorContainer &error);
 }
 
 #endif // KITSUNEMIMI_HANAMI_SAGIRI_SEND_H
