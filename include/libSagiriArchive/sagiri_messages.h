@@ -52,9 +52,10 @@ public:
 
     std::string uuid = "";
     std::string fileUuid = "";
-    DataBuffer data;
+    void* payload = nullptr;
+    uint64_t payloadSize = 0;
 
-    bool read(const void* data, const uint64_t dataSize);
+    bool read(void* data, const uint64_t dataSize);
     void createBlob(DataBuffer &result);
 };
 
@@ -69,7 +70,7 @@ public:
 
     std::string uuid = "";
 
-    bool read(const void* data, const uint64_t dataSize);
+    bool read(void* data, const uint64_t dataSize);
     void createBlob(DataBuffer &result);
 };
 
@@ -85,7 +86,7 @@ public:
     std::string location = "";
     std::string columnName = "";
 
-    bool read(const void* data, const uint64_t dataSize);
+    bool read(void* data, const uint64_t dataSize);
     void createBlob(DataBuffer &result);
 };
 
@@ -101,7 +102,7 @@ public:
     std::string uuid = "";
     std::string results;
 
-    bool read(const void* data, const uint64_t dataSize);
+    bool read(void* data, const uint64_t dataSize);
     void createBlob(DataBuffer &result);
 };
 
@@ -119,7 +120,7 @@ public:
     std::string endpoint = "";
     std::string type = "";
 
-    bool read(const void* data, const uint64_t dataSize);
+    bool read(void* data, const uint64_t dataSize);
     void createBlob(DataBuffer &result);
 };
 

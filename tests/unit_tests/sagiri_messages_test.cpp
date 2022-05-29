@@ -44,7 +44,9 @@ HanamiMessages_Test::clusterSnapshot_test()
 
     sourceMessage.uuid = "asdf";
     sourceMessage.fileUuid = "poi";
-    strncpy(static_cast<char*>(sourceMessage.data.data), "12345", 5);
+    sourceMessage.payload = new uint8_t[10];
+    sourceMessage.payloadSize = 5;
+    strncpy(static_cast<char*>(sourceMessage.payload), "12345", 5);
 
     Kitsunemimi::DataBuffer result;
     sourceMessage.createBlob(result);
@@ -55,9 +57,9 @@ HanamiMessages_Test::clusterSnapshot_test()
     TEST_EQUAL(targetMessage.uuid, sourceMessage.uuid);
     TEST_EQUAL(targetMessage.fileUuid, sourceMessage.fileUuid);
 
-    const int compareRet = memcmp(targetMessage.data.data,
-                                  sourceMessage.data.data,
-                                  sourceMessage.data.usedBufferSize);
+    const int compareRet = memcmp(targetMessage.payload,
+                                  sourceMessage.payload,
+                                  sourceMessage.payloadSize);
     TEST_EQUAL(compareRet, 0);
 }
 

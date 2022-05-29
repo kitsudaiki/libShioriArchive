@@ -50,7 +50,7 @@ ClusterSnapshotPush_Message::~ClusterSnapshotPush_Message() {}
  * @return false, if message is broken, else true
  */
 bool
-ClusterSnapshotPush_Message::read(const void* data, const uint64_t dataSize)
+ClusterSnapshotPush_Message::read(void* data, const uint64_t dataSize)
 {
     if(initRead(data, dataSize) == false) {
         return false;
@@ -62,7 +62,7 @@ ClusterSnapshotPush_Message::read(const void* data, const uint64_t dataSize)
     if(readString(data, fileUuid) == false) {
         return false;
     }
-    if(readBinary(data, this->data) == false) {
+    if(readBinary(data, &payload, payloadSize) == false) {
         return false;
     }
 
@@ -81,12 +81,12 @@ ClusterSnapshotPush_Message::createBlob(DataBuffer &result)
                                   + 3 * sizeof(Entry)
                                   + uuid.size()
                                   + fileUuid.size()
-                                  + data.usedBufferSize;
+                                  + payloadSize;
 
     initBlob(result, totalMsgSize);
     appendString(result, uuid);
     appendString(result, fileUuid);
-    appendData(result, data);
+    appendData(result, payload, payloadSize);
 }
 
 //==================================================================================================
@@ -113,7 +113,7 @@ ClusterSnapshotPull_Message::~ClusterSnapshotPull_Message() {}
  * @return false, if message is broken, else true
  */
 bool
-ClusterSnapshotPull_Message::read(const void* data, const uint64_t dataSize)
+ClusterSnapshotPull_Message::read(void* data, const uint64_t dataSize)
 {
     if(initRead(data, dataSize) == false) {
         return false;
@@ -166,7 +166,7 @@ DatasetRequest_Message::~DatasetRequest_Message() {}
  * @return false, if message is broken, else true
  */
 bool
-DatasetRequest_Message::read(const void* data, const uint64_t dataSize)
+DatasetRequest_Message::read(void* data, const uint64_t dataSize)
 {
     if(initRead(data, dataSize) == false) {
         return false;
@@ -224,7 +224,7 @@ ResultPush_Message::~ResultPush_Message() {}
  * @return false, if message is broken, else true
  */
 bool
-ResultPush_Message::read(const void* data, const uint64_t dataSize)
+ResultPush_Message::read(void* data, const uint64_t dataSize)
 {
     if(initRead(data, dataSize) == false) {
         return false;
@@ -282,7 +282,7 @@ AuditLog_Message::~AuditLog_Message() {}
  * @return false, if message is broken, else true
  */
 bool
-AuditLog_Message::read(const void* data, const uint64_t dataSize)
+AuditLog_Message::read(void* data, const uint64_t dataSize)
 {
     if(initRead(data, dataSize) == false) {
         return false;
