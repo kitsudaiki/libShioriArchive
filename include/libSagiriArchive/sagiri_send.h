@@ -39,10 +39,12 @@ class JsonItem;
 namespace Sagiri
 {
 
-Kitsunemimi::DataBuffer* getData(const std::string &token,
-                                 const std::string &uuid,
-                                 const std::string &columnName,
-                                 Kitsunemimi::ErrorContainer &error);
+Kitsunemimi::DataBuffer* getDatasetData(const std::string &token,
+                                        const std::string &uuid,
+                                        const std::string &columnName,
+                                        Kitsunemimi::ErrorContainer &error);
+Kitsunemimi::DataBuffer* getSnapshotData(const std::string &location,
+                                         Kitsunemimi::ErrorContainer &error);
 
 bool sendResults(const std::string &uuid,
                  const Kitsunemimi::DataArray &results,
@@ -52,6 +54,11 @@ bool getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
                            const std::string &dataSetUuid,
                            const std::string &token,
                            Kitsunemimi::ErrorContainer &error);
+
+bool getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
+                            const std::string &snapshotUuid,
+                            const std::string &token,
+                            Kitsunemimi::ErrorContainer &error);
 
 void sendAuditMessage(const std::string &targetComponent,
                       const std::string &targetEndpoint,

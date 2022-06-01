@@ -48,10 +48,10 @@ namespace Sagiri
  * @return data-buffer with data if successful, else nullptr
  */
 Kitsunemimi::DataBuffer*
-getData(const std::string &token,
-        const std::string &uuid,
-        const std::string &columnName,
-        Kitsunemimi::ErrorContainer &error)
+getDatasetData(const std::string &token,
+               const std::string &uuid,
+               const std::string &columnName,
+               Kitsunemimi::ErrorContainer &error)
 {
     Kitsunemimi::Hanami::ResponseMessage response;
     HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
@@ -90,6 +90,28 @@ getData(const std::string &token,
     DatasetRequest_Message msg;
     msg.location = jsonItem.get("location").getString();
     msg.columnName = columnName;
+    DataBuffer msgBlob;
+    msg.createBlob(msgBlob);
+
+    return client->sendGenericRequest(msgBlob.data, msgBlob.usedBufferSize, error);
+}
+
+/**
+ * @brief getSnapshotData
+ * @param token
+ * @param uuid
+ * @param error
+ * @return
+ */
+Kitsunemimi::DataBuffer*
+getSnapshotData(const std::string &location,
+                Kitsunemimi::ErrorContainer &error)
+{
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+
+    // create real request
+    ClusterSnapshotPull_Message msg;
+    msg.location = location;
     DataBuffer msgBlob;
     msg.createBlob(msgBlob);
 
@@ -261,6 +283,54 @@ sendAuditMessage(const std::string &targetComponent,
     if(client->sendGenericMessage(msgBlob.data, msgBlob.usedBufferSize, error) == false) {
         LOG_ERROR(error);
     }
+}
+
+/**
+ * @brief getSnapshotInformation
+ * @param result
+ * @param dataSetUuid
+ * @param token
+ * @param error
+ * @return
+ */
+bool
+getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
+                       const std::string &snapshotUuid,
+                       const std::string &token,
+                       Kitsunemimi::ErrorContainer &error)
+{
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    if(client == nullptr) {
+        return false;
+    }
+
+    Kitsunemimi::Hanami::ResponseMessage response;
+
+    // create request for remote-calls
+    Kitsunemimi::Hanami::RequestMessage request;
+    request.id = "v1/cluster_snapshot";
+    request.httpType = Kitsunemimi::Hanami::GET_TYPE;
+    request.inputValues = "{\"uuid\" : \"" + snapshotUuid + "\","
+                          "\"token\":\"" + token + "\"}";
+
+    // send request to the target
+    if(client->triggerSakuraFile(response, request, error) == false) {
+        return false;
+    }
+
+    // check response
+    if(response.success == false)
+    {
+        error.addMeesage(response.responseContent);
+        return false;
+    }
+
+    // parse result
+    if(result.parse(response.responseContent, error) == false) {
+        return false;
+    }
+
+    return true;
 }
 
 }

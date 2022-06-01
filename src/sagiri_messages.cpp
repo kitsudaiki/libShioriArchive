@@ -119,7 +119,7 @@ ClusterSnapshotPull_Message::read(void* data, const uint64_t dataSize)
         return false;
     }
 
-    if(readString(data, uuid) == false) {
+    if(readString(data, location) == false) {
         return false;
     }
 
@@ -136,10 +136,10 @@ ClusterSnapshotPull_Message::createBlob(Kitsunemimi::DataBuffer &result)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
                                   + 1 * sizeof(Entry)
-                                  + uuid.size();
+                                  + location.size();
 
     initBlob(result, totalMsgSize);
-    appendString(result, uuid);
+    appendString(result, location);
 }
 
 //==================================================================================================

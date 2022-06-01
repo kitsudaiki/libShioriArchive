@@ -68,7 +68,7 @@ public:
     ClusterSnapshotPull_Message();
     ~ClusterSnapshotPull_Message();
 
-    std::string uuid = "";
+    std::string location = "";
 
     bool read(void* data, const uint64_t dataSize);
     void createBlob(DataBuffer &result);
