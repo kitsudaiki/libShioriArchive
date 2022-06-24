@@ -23,7 +23,7 @@
 #ifndef SAGIRIMESSAGES_H
 #define SAGIRIMESSAGES_H
 
-#include <libKitsunemimiHanamiMessaging/hanami_messages.h>
+#include <libKitsunemimiHanamiCommon/messages.h>
 
 using Kitsunemimi::Hanami::HanamiMessage;
 using Kitsunemimi::DataBuffer;
