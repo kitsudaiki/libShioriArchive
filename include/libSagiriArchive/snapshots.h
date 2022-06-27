@@ -46,6 +46,29 @@ bool getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
                             const std::string &snapshotUuid,
                             const std::string &token,
                             Kitsunemimi::ErrorContainer &error);
+
+bool runInitProcess(std::string &fileUuid,
+                    const std::string &snapshotUuid,
+                    const std::string &snapshotName,
+                    const std::string &userUuid,
+                    const std::string &projectUuid,
+                    const uint64_t totalSize,
+                    const std::string &headerMessage,
+                    const std::string &token,
+                    Kitsunemimi::ErrorContainer &error);
+
+bool sendData(const Kitsunemimi::DataBuffer* data,
+              uint64_t &targetPos,
+              const std::string &uuid,
+              const std::string &fileUuid,
+              Kitsunemimi::ErrorContainer &error);
+
+bool runFinalizeProcess(const std::string &snapshotUuid,
+                        const std::string &fileUuid,
+                        const std::string &token,
+                        const std::string &userUuid,
+                        const std::string &projectUuid,
+                        Kitsunemimi::ErrorContainer &error);
 }
 
 #endif // KITSUNEMIMI_HANAMI_SAGIRI_SNAPSHOTS_H

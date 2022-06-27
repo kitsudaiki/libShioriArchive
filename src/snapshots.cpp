@@ -104,4 +104,240 @@ getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
     return true;
 }
 
+/**
+ * @brief initialize the transfer of the cluster-snapshot to sagiri
+ *
+ * @param fileUuid
+ * @param snapshotUuid
+ * @param snapshotName
+ * @param userUuid
+ * @param projectUuid
+ * @param totalSize
+ * @param headerMessage
+ * @param token
+ * @param error reference for error-output
+ *
+ * @return true, if successful, else false
+ */
+bool
+runInitProcess(std::string &fileUuid,
+               const std::string &snapshotUuid,
+               const std::string &snapshotName,
+               const std::string &userUuid,
+               const std::string &projectUuid,
+               const uint64_t totalSize,
+               const std::string &headerMessage,
+               const std::string &token,
+               Kitsunemimi::ErrorContainer &error)
+{
+    // get internal client for interaction with sagiri
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    if(client == nullptr)
+    {
+        error.addMeesage("Failed to get client to sagiri");
+        error.addSolution("Check if sagiri is correctly configured");
+        return false;
+    }
+
+    // create request
+    Kitsunemimi::Hanami::RequestMessage requestMsg;
+    requestMsg.id = "v1/cluster_snapshot";
+    requestMsg.httpType = Kitsunemimi::Hanami::HttpRequestType::POST_TYPE;
+    requestMsg.inputValues = "";
+    requestMsg.inputValues.append("{\"user_uuid\":\"");
+    requestMsg.inputValues.append(userUuid);
+    requestMsg.inputValues.append("\",\"token\":\"");
+    requestMsg.inputValues.append(token);
+    requestMsg.inputValues.append("\",\"uuid\":\"");
+    requestMsg.inputValues.append(snapshotUuid);
+    requestMsg.inputValues.append("\",\"header\":");
+    requestMsg.inputValues.append(headerMessage);
+    requestMsg.inputValues.append(",\"project_uuid\":\"");
+    requestMsg.inputValues.append(projectUuid);
+    requestMsg.inputValues.append("\",\"name\":\"");
+    requestMsg.inputValues.append(snapshotName);
+    requestMsg.inputValues.append("\",\"input_data_size\":");
+    requestMsg.inputValues.append(std::to_string(totalSize));
+    requestMsg.inputValues.append("}");
+
+    // trigger initializing of snapshot
+    Kitsunemimi::Hanami::ResponseMessage response;
+    if(client->triggerSakuraFile(response, requestMsg, error) == false)
+    {
+        error.addMeesage("Failed to trigger blossom in sagiri to initialize "
+                         "the transfer of a cluster");
+        return false;
+    }
+
+    // check response
+    if(response.success == false)
+    {
+        error.addMeesage(response.responseContent);
+        error.addMeesage("Failed to trigger blossom in sagiri to initialize "
+                         "the transfer of a cluster");
+        return false;
+    }
+
+    // process response
+    LOG_DEBUG("Response from initializing cluster-snapshot: " + response.responseContent);
+    Kitsunemimi::Json::JsonItem parsedResponse;
+    if(parsedResponse.parse(response.responseContent, error) == false)
+    {
+        error.addMeesage("Failed to parse reponse from sagiri for the initializing "
+                         "of the snapshot-transfer");
+        return false;
+    }
+    fileUuid = parsedResponse.get("uuid_input_file").getString();
+
+    return true;
+}
+
+/**
+ * @brief send data of the snapshot to sagiri
+ *
+ * @param data buffer with data to send
+ * @param targetPos byte-position within the snapshot where the data belongs to
+ * @param uuid uuid of the snapshot
+ * @param fileUuid uuid of the temporary file in sagiri for identification
+ * @param error reference for error-output
+ *
+ * @return true, if successful, else false
+ */
+bool
+sendData(const Kitsunemimi::DataBuffer* data,
+         uint64_t &targetPos,
+         const std::string &uuid,
+         const std::string &fileUuid,
+         Kitsunemimi::ErrorContainer &error)
+{
+    // get internal client for interaction with sagiri
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    if(client == nullptr)
+    {
+        error.addMeesage("Failed to get client to sagiri");
+        error.addSolution("Check if sagiri is correctly configured");
+        return false;
+    }
+
+    const uint64_t dataSize = data->usedBufferSize;
+    const uint8_t* u8Data = static_cast<const uint8_t*>(data->data);
+
+    uint8_t sendBuffer[128*1024];
+    uint64_t i = 0;
+    uint64_t pos = 0;
+
+    // prepare buffer
+    uint64_t segmentSize = 96 * 1024;
+    memcpy(&sendBuffer[0], uuid.c_str(), 36);
+    memcpy(&sendBuffer[36], fileUuid.c_str(), 36);
+
+    do
+    {
+        pos = i + targetPos;
+        memcpy(&sendBuffer[72], &pos, 8);
+
+        // check the size for the last segment
+        segmentSize = 96 * 1024;
+        if(dataSize - i < segmentSize) {
+            segmentSize = dataSize - i;
+        }
+
+        // read segment of the local file
+        memcpy(&sendBuffer[80], &u8Data[i], segmentSize);
+
+        // send segment
+        if(client->sendStreamMessage(sendBuffer, segmentSize + 80, false, error) == false)
+        {
+            error.addMeesage("Failed to send part with position '"
+                             + std::to_string(i)
+                             + "' to sagiri");
+            return false;
+        }
+
+        i += segmentSize;
+    }
+    while(i < dataSize);
+
+    targetPos += i;
+
+    return true;
+}
+
+/**
+ * @brief finalize the transfer of the snapshot to sagiri
+ *
+ * @param snapshotUuid
+ * @param fileUuid
+ * @param token
+ * @param userUuid
+ * @param projectUuid
+ * @param error reference for error-output
+ *
+ * @return true, if successful, else false
+ */
+bool
+runFinalizeProcess(const std::string &snapshotUuid,
+                   const std::string &fileUuid,
+                   const std::string &token,
+                   const std::string &userUuid,
+                   const std::string &projectUuid,
+                   Kitsunemimi::ErrorContainer &error)
+{
+    // get internal client for interaction with sagiri
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    if(client == nullptr)
+    {
+        error.addMeesage("Failed to get client to sagiri");
+        error.addSolution("Check if sagiri is correctly configured");
+        return false;
+    }
+
+    // create request
+    Kitsunemimi::Hanami::RequestMessage requestMsg;
+    requestMsg.id = "v1/cluster_snapshot";
+    requestMsg.httpType = Kitsunemimi::Hanami::HttpRequestType::PUT_TYPE;
+    requestMsg.inputValues = "";
+    requestMsg.inputValues.append("{\"user_uuid\":\"");
+    requestMsg.inputValues.append(userUuid);
+    requestMsg.inputValues.append("\",\"token\":\"");
+    requestMsg.inputValues.append(token);
+    requestMsg.inputValues.append("\",\"project_uuid\":\"");
+    requestMsg.inputValues.append(projectUuid);
+    requestMsg.inputValues.append("\",\"uuid\":\"");
+    requestMsg.inputValues.append(snapshotUuid);
+    requestMsg.inputValues.append("\",\"uuid_input_file\":\"");
+    requestMsg.inputValues.append(fileUuid);
+    requestMsg.inputValues.append("\"}");
+
+    // trigger finalizing of snapshot
+    Kitsunemimi::Hanami::ResponseMessage response;
+    if(client->triggerSakuraFile(response, requestMsg, error) == false)
+    {
+        error.addMeesage("Failed to trigger blossom in sagiri to finalize "
+                         "the transfer of a cluster");
+        return false;
+    }
+
+    // check response
+    if(response.success == false)
+    {
+        error.addMeesage(response.responseContent);
+        error.addMeesage("Failed to trigger blossom in sagiri to finalize "
+                         "the transfer of a cluster");
+        return false;
+    }
+
+    // process response
+    LOG_DEBUG("Response from finalizing cluster-snapshot: " + response.responseContent);
+    Kitsunemimi::Json::JsonItem parsedResponse;
+    if(parsedResponse.parse(response.responseContent, error) == false)
+    {
+        error.addMeesage("Failed to parse reponse from sagiri for the finalizeing "
+                         "of the snapshot-transfer");
+        return false;
+    }
+
+    return true;
+}
+
 }
