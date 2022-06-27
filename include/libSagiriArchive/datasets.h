@@ -1,5 +1,5 @@
 /**
- * @file        sagiri_send.h
+ * @file        datasets.h
  *
  * @author      Tobias Anker <tobias.anker@kitsunemimi.moe>
  *
@@ -20,8 +20,8 @@
  *      limitations under the License.
  */
 
-#ifndef KITSUNEMIMI_HANAMI_SAGIRI_SEND_H
-#define KITSUNEMIMI_HANAMI_SAGIRI_SEND_H
+#ifndef KITSUNEMIMI_HANAMI_SAGIRI_DATASETS_H
+#define KITSUNEMIMI_HANAMI_SAGIRI_DATASETS_H
 
 #include <string>
 
@@ -43,34 +43,11 @@ Kitsunemimi::DataBuffer* getDatasetData(const std::string &token,
                                         const std::string &uuid,
                                         const std::string &columnName,
                                         Kitsunemimi::ErrorContainer &error);
-Kitsunemimi::DataBuffer* getSnapshotData(const std::string &location,
-                                         Kitsunemimi::ErrorContainer &error);
-
-bool sendResults(const std::string &uuid,
-                 const Kitsunemimi::DataArray &results,
-                 Kitsunemimi::ErrorContainer &error);
 
 bool getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
                            const std::string &dataSetUuid,
                            const std::string &token,
                            Kitsunemimi::ErrorContainer &error);
-
-bool getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
-                            const std::string &snapshotUuid,
-                            const std::string &token,
-                            Kitsunemimi::ErrorContainer &error);
-
-void sendAuditMessage(const std::string &targetComponent,
-                      const std::string &targetEndpoint,
-                      const std::string &userUuid,
-                      const Kitsunemimi::Hanami::HttpRequestType requestType);
-
-bool sendClusterSnapshotPushFinish(const std::string &uuid,
-                                   const std::string &fileUuid,
-                                   Kitsunemimi::ErrorContainer &error);
-
-bool getClusterSnapshot(const std::string &uuid,
-                        Kitsunemimi::ErrorContainer &error);
 }
 
-#endif // KITSUNEMIMI_HANAMI_SAGIRI_SEND_H
+#endif // KITSUNEMIMI_HANAMI_SAGIRI_DATASETS_H
