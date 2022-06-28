@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0] - 2022-06-28
+
+### Added
+- send audit-logs
+- transfer of cluster-snapshots
+
+
 ## [0.1.0] - 2022-02-13
 
 ### Added
