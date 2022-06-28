@@ -35,11 +35,12 @@ namespace Sagiri
 {
 
 /**
- * @brief getSnapshotData
- * @param token
- * @param uuid
- * @param error
- * @return
+ * @brief get data of a snapshot from sagiri
+ *
+ * @param location file-location of the snapshot within sagiri
+ * @param error reference for error-output
+ *
+ * @return pointer to buffer with the data of the snapshot
  */
 Kitsunemimi::DataBuffer*
 getSnapshotData(const std::string &location,
@@ -57,12 +58,14 @@ getSnapshotData(const std::string &location,
 }
 
 /**
- * @brief getSnapshotInformation
- * @param result
- * @param dataSetUuid
- * @param token
- * @param error
- * @return
+ * @brief get information of a specific snapshot from sagiri
+ *
+ * @param result reference for the output of the resulting json
+ * @param snapshotUuid uuid of the requested snapshot
+ * @param token access-token for sagiri
+ * @param error reference for error-output
+ *
+ * @return true, if successful, else false
  */
 bool
 getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
@@ -107,14 +110,14 @@ getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
 /**
  * @brief initialize the transfer of the cluster-snapshot to sagiri
  *
- * @param fileUuid
- * @param snapshotUuid
- * @param snapshotName
- * @param userUuid
- * @param projectUuid
- * @param totalSize
- * @param headerMessage
- * @param token
+ * @param fileUuid uuid of the temporary file of the snapshot in sagiri
+ * @param snapshotUuid uuid of the new snapshot, which should be the same like the task-uuid
+ * @param snapshotName name of the new snapshot
+ * @param userUuid uuid of the user who owns the snapshot
+ * @param projectUuid uuid of the project in with the snapshot was created
+ * @param totalSize total size of the snapshot
+ * @param headerMessage header-message with meta-information of the snapshot
+ * @param token access-token for sagiri
  * @param error reference for error-output
  *
  * @return true, if successful, else false
@@ -266,11 +269,11 @@ sendData(const Kitsunemimi::DataBuffer* data,
 /**
  * @brief finalize the transfer of the snapshot to sagiri
  *
- * @param snapshotUuid
- * @param fileUuid
- * @param token
- * @param userUuid
- * @param projectUuid
+ * @param snapshotUuid uuid of the snapshot to finalize
+ * @param fileUuid uuid of the temporary file of the snapshot in sagiri
+ * @param token access-token for sagiri
+ * @param userUuid uuid of the user who owns the snapshot
+ * @param projectUuid uuid of the project in with the snapshot was created
  * @param error reference for error-output
  *
  * @return true, if successful, else false

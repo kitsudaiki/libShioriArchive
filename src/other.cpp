@@ -98,10 +98,12 @@ sendErrorMessage(const std::string &userUuid,
 }
 
 /**
- * @brief send error-message to sagiri
+ * @brief send audit-log-entry to sagiri
  *
- * @param context context context-object to log
- * @param inputValues inputValues input-values of the request to log
+ * @param targetComponent accessed component
+ * @param targetEndpoint accessed endpoint
+ * @param userUuid user-uuid who made the request to the endpoint
+ * @param requestType http-type of the request
  */
 void
 sendAuditMessage(const std::string &targetComponent,
