@@ -48,11 +48,11 @@ HanamiMessages_Test::clusterSnapshot_test()
     sourceMessage.payloadSize = 5;
     strncpy(static_cast<char*>(sourceMessage.payload), "12345", 5);
 
-    Kitsunemimi::DataBuffer result;
-    sourceMessage.createBlob(result);
+    uint8_t buffer[96*1024];
+    const uint64_t size = sourceMessage.createBlob(buffer, 96*1024);
 
     ClusterSnapshotPush_Message targetMessage;
-    TEST_EQUAL(targetMessage.read(result.data, result.usedBufferSize), true);
+    TEST_EQUAL(targetMessage.read(buffer, size), true);
 
     TEST_EQUAL(targetMessage.uuid, sourceMessage.uuid);
     TEST_EQUAL(targetMessage.fileUuid, sourceMessage.fileUuid);

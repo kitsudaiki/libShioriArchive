@@ -56,7 +56,7 @@ public:
     uint64_t payloadSize = 0;
 
     bool read(void* data, const uint64_t dataSize);
-    void createBlob(DataBuffer &result);
+    uint64_t createBlob(uint8_t* result, const uint64_t bufferSize);
 };
 
 //==================================================================================================
@@ -71,7 +71,7 @@ public:
     std::string location = "";
 
     bool read(void* data, const uint64_t dataSize);
-    void createBlob(DataBuffer &result);
+    uint64_t createBlob(uint8_t* result, const uint64_t bufferSize);
 };
 
 //==================================================================================================
@@ -87,7 +87,7 @@ public:
     std::string columnName = "";
 
     bool read(void* data, const uint64_t dataSize);
-    void createBlob(DataBuffer &result);
+    uint64_t createBlob(uint8_t* result, const uint64_t bufferSize);
 };
 
 //==================================================================================================
@@ -103,7 +103,7 @@ public:
     std::string results;
 
     bool read(void* data, const uint64_t dataSize);
-    void createBlob(DataBuffer &result);
+    uint64_t createBlob(uint8_t* result, const uint64_t bufferSize);
 };
 
 //==================================================================================================
@@ -121,7 +121,7 @@ public:
     std::string type = "";
 
     bool read(void* data, const uint64_t dataSize);
-    void createBlob(DataBuffer &result);
+    uint64_t createBlob(uint8_t* result, const uint64_t bufferSize);
 };
 
 //==================================================================================================
