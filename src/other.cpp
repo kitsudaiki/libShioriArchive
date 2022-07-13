@@ -60,13 +60,12 @@ sendResults(const std::string &uuid,
     ResultPush_Message msg;
     msg.uuid = uuid;
     msg.results = results.toString();
-    DataBuffer msgBlob;
-    msg.createBlob(msgBlob);
+    uint8_t buffer[96*1024];
+    const uint64_t size = msg.createBlob(buffer, 96*1024);
 
-    Kitsunemimi::DataBuffer* ret = client->sendGenericRequest(msgBlob.data,
-                                                              msgBlob.usedBufferSize,
-                                                              error);
+    Kitsunemimi::DataBuffer* ret = client->sendGenericRequest(buffer, size, error);
     delete ret;
+
     return true;
 }
 
@@ -90,11 +89,11 @@ sendErrorMessage(const std::string &userUuid,
     Kitsunemimi::Hanami::ErrorLog_Message msg;
     msg.userUuid = userUuid;
     msg.errorMsg = errorMessage;
-    DataBuffer msgBlob;
-    msg.createBlob(msgBlob);
+    uint8_t buffer[96*1024];
+    const uint64_t size = msg.createBlob(buffer, 96*1024);
 
     // send
-    client->sendGenericMessage(msgBlob.data, msgBlob.usedBufferSize, error);
+    client->sendGenericMessage(buffer, size, error);
 }
 
 /**
@@ -149,10 +148,10 @@ sendAuditMessage(const std::string &targetComponent,
     msg.type = httpType;
     msg.component = targetComponent;
     msg.endpoint = targetEndpoint;
-    DataBuffer msgBlob;
-    msg.createBlob(msgBlob);
+    uint8_t buffer[96*1024];
+    const uint64_t size = msg.createBlob(buffer, 96*1024);
 
-    if(client->sendGenericMessage(msgBlob.data, msgBlob.usedBufferSize, error) == false) {
+    if(client->sendGenericMessage(buffer, size, error) == false) {
         LOG_ERROR(error);
     }
 }

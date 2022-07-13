@@ -51,10 +51,10 @@ getSnapshotData(const std::string &location,
     // create real request
     ClusterSnapshotPull_Message msg;
     msg.location = location;
-    DataBuffer msgBlob;
-    msg.createBlob(msgBlob);
+    uint8_t buffer[96*1024];
+    const uint64_t size = msg.createBlob(buffer, 96*1024);
 
-    return client->sendGenericRequest(msgBlob.data, msgBlob.usedBufferSize, error);
+    return client->sendGenericRequest(buffer, size, error);
 }
 
 /**

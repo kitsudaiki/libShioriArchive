@@ -74,8 +74,8 @@ ClusterSnapshotPush_Message::read(void* data, const uint64_t dataSize)
  *
  * @param result data-buffer for the resulting binary
  */
-void
-ClusterSnapshotPush_Message::createBlob(DataBuffer &result)
+uint64_t
+ClusterSnapshotPush_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
                                   + 3 * sizeof(Entry)
@@ -83,10 +83,19 @@ ClusterSnapshotPush_Message::createBlob(DataBuffer &result)
                                   + fileUuid.size()
                                   + payloadSize;
 
-    initBlob(result, totalMsgSize);
-    appendString(result, uuid);
-    appendString(result, fileUuid);
-    appendData(result, payload, payloadSize);
+    if(bufferSize < totalMsgSize) {
+        return 0;
+    }
+
+    uint64_t pos = 0;
+    pos += initBlob(&result[pos], totalMsgSize);
+    pos += appendString(&result[pos], uuid);
+    pos += appendString(&result[pos], fileUuid);
+    pos += appendData(&result[pos], payload, payloadSize);
+
+    assert(pos == totalMsgSize);
+
+    return pos;
 }
 
 //==================================================================================================
@@ -131,15 +140,24 @@ ClusterSnapshotPull_Message::read(void* data, const uint64_t dataSize)
  *
  * @param result data-buffer for the resulting binary
  */
-void
-ClusterSnapshotPull_Message::createBlob(Kitsunemimi::DataBuffer &result)
+uint64_t
+ClusterSnapshotPull_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
                                   + 1 * sizeof(Entry)
                                   + location.size();
 
-    initBlob(result, totalMsgSize);
-    appendString(result, location);
+    if(bufferSize < totalMsgSize) {
+        return 0;
+    }
+
+    uint64_t pos = 0;
+    pos += initBlob(&result[pos], totalMsgSize);
+    pos += appendString(&result[pos], location);
+
+    assert(pos == totalMsgSize);
+
+    return pos;
 }
 
 //==================================================================================================
@@ -187,17 +205,26 @@ DatasetRequest_Message::read(void* data, const uint64_t dataSize)
  *
  * @param result data-buffer for the resulting binary
  */
-void
-DatasetRequest_Message::createBlob(DataBuffer &result)
+uint64_t
+DatasetRequest_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
                                   + 2 * sizeof(Entry)
                                   + location.size()
                                   + columnName.size();
 
-    initBlob(result, totalMsgSize);
-    appendString(result, location);
-    appendString(result, columnName);
+    if(bufferSize < totalMsgSize) {
+        return 0;
+    }
+
+    uint64_t pos = 0;
+    pos += initBlob(&result[pos], totalMsgSize);
+    pos += appendString(&result[pos], location);
+    pos += appendString(&result[pos], columnName);
+
+    assert(pos == totalMsgSize);
+
+    return pos;
 }
 
 //==================================================================================================
@@ -245,17 +272,26 @@ ResultPush_Message::read(void* data, const uint64_t dataSize)
  *
  * @param result data-buffer for the resulting binary
  */
-void
-ResultPush_Message::createBlob(DataBuffer &result)
+uint64_t
+ResultPush_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
                                   + 2 * sizeof(Entry)
                                   + uuid.size()
                                   + results.size();
 
-    initBlob(result, totalMsgSize);
-    appendString(result, uuid);
-    appendString(result, results);
+    if(bufferSize < totalMsgSize) {
+        return 0;
+    }
+
+    uint64_t pos = 0;
+    pos += initBlob(&result[pos], totalMsgSize);
+    pos += appendString(&result[pos], uuid);
+    pos += appendString(&result[pos], results);
+
+    assert(pos == totalMsgSize);
+
+    return pos;
 }
 
 //==================================================================================================
@@ -309,8 +345,8 @@ AuditLog_Message::read(void* data, const uint64_t dataSize)
  *
  * @param result data-buffer for the resulting binary
  */
-void
-AuditLog_Message::createBlob(DataBuffer &result)
+uint64_t
+AuditLog_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
                                   + 4 * sizeof(Entry)
@@ -319,11 +355,20 @@ AuditLog_Message::createBlob(DataBuffer &result)
                                   + endpoint.size()
                                   + type.size();
 
-    initBlob(result, totalMsgSize);
-    appendString(result, userUuid);
-    appendString(result, component);
-    appendString(result, endpoint);
-    appendString(result, type);
+    if(bufferSize < totalMsgSize) {
+        return 0;
+    }
+
+    uint64_t pos = 0;
+    pos += initBlob(&result[pos], totalMsgSize);
+    pos += appendString(&result[pos], userUuid);
+    pos += appendString(&result[pos], component);
+    pos += appendString(&result[pos], endpoint);
+    pos += appendString(&result[pos], type);
+
+    assert(pos == totalMsgSize);
+
+    return pos;
 }
 
 //==================================================================================================
