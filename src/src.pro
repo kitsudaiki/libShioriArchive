@@ -70,7 +70,7 @@ LIBS += -L../../libKitsunemimiHanamiMessaging/src/debug -lKitsunemimiHanamiMessa
 LIBS += -L../../libKitsunemimiHanamiMessaging/src/release -lKitsunemimiHanamiMessaging
 INCLUDEPATH += ../../libKitsunemimiHanamiMessaging/include
 
-LIBS += -lssl -lcryptopp -lcrypto
+LIBS += -lssl -lcryptopp -lcrypto -pthread -lprotobuf -lpthread
 
 INCLUDEPATH += $$PWD \
                $$PWD/../include
@@ -86,3 +86,22 @@ SOURCES += \
     other.cpp \
     sagiri_messages.cpp \
     snapshots.cpp
+
+SAGIRI_PROTO_BUFFER = ../../libKitsunemimiHanamiProtobuffers/sagiri_messages.proto3
+
+OTHER_FILES += $$SAGIRI_PROTO_BUFFER
+
+protobuf_decl.name = protobuf headers
+protobuf_decl.input = SAGIRI_PROTO_BUFFER
+protobuf_decl.output = ${QMAKE_FILE_IN_PATH}/${QMAKE_FILE_BASE}.proto3.pb.h
+protobuf_decl.commands = protoc --cpp_out=${QMAKE_FILE_IN_PATH} --proto_path=${QMAKE_FILE_IN_PATH} ${QMAKE_FILE_NAME}
+protobuf_decl.variable_out = HEADERS
+QMAKE_EXTRA_COMPILERS += protobuf_decl
+
+protobuf_impl.name = protobuf sources
+protobuf_impl.input = SAGIRI_PROTO_BUFFER
+protobuf_impl.output = ${QMAKE_FILE_IN_PATH}/${QMAKE_FILE_BASE}.proto3.pb.cc
+protobuf_impl.depends = ${QMAKE_FILE_IN_PATH}/${QMAKE_FILE_BASE}.proto3.pb.h
+protobuf_impl.commands = $$escape_expand(\n)
+protobuf_impl.variable_out = SOURCES
+QMAKE_EXTRA_COMPILERS += protobuf_impl
