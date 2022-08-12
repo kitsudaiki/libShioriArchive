@@ -27,7 +27,7 @@
 #include <libKitsunemimiHanamiMessaging/hanami_messaging.h>
 #include <libKitsunemimiHanamiMessaging/hanami_messaging_client.h>
 
-#include <../../libKitsunemimiHanamiProtobuffers/sagiri_messages.proto3.pb.h>
+#include <../../libKitsunemimiHanamiMessages/hanami_messages/sagiri_messages.h>
 
 using Kitsunemimi::Hanami::HanamiMessaging;
 using Kitsunemimi::Hanami::HanamiMessagingClient;
@@ -235,11 +235,11 @@ sendData(const Kitsunemimi::DataBuffer* data,
     uint64_t segmentSize = 96 * 1024;
 
 
-    FileUpload_Message message;
-    message.set_fileuuid(fileUuid);
-    message.set_datasetuuid(uuid);
-    message.set_type(UploadDataType::CLUSTER_SNAPSHOT_TYPE);
-    message.set_islast(false);
+    Kitsunemimi::Hanami::FileUpload_Message message;
+    message.fileUuid = fileUuid;
+    message.datasetUuid = uuid;
+    message.type = Kitsunemimi::Hanami::FileUpload_Message::UploadDataType::CLUSTER_SNAPSHOT_TYPE;
+    message.isLast = false;
 
     do
     {
@@ -250,15 +250,16 @@ sendData(const Kitsunemimi::DataBuffer* data,
         if(dataSize - i < segmentSize)
         {
             segmentSize = dataSize - i;
-            message.set_islast(true);
+            message.isLast = true;
         }
 
         // read segment of the local file
-        message.set_position(pos);
-        message.set_data(&u8Data[i], segmentSize);
+        message.position = pos;
+        message.payload = const_cast<void*>(static_cast<const void*>(&u8Data[i]));
+        message.numberOfBytes = segmentSize;
 
-        const uint64_t msgSize = message.ByteSizeLong();
-        if(message.SerializeToArray(sendBuffer, msgSize) == false)
+        const uint64_t msgSize = message.createBlob(sendBuffer, 128*1024);
+        if(msgSize == 0)
         {
             error.addMeesage("Failed to serialize learn-message");
             return false;
