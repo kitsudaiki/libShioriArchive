@@ -27,6 +27,8 @@
 #include <libKitsunemimiHanamiMessaging/hanami_messaging.h>
 #include <libKitsunemimiHanamiMessaging/hanami_messaging_client.h>
 
+#include <../../libKitsunemimiHanamiMessages/hanami_messages/sagiri_messages.h>
+
 using Kitsunemimi::Hanami::HanamiMessaging;
 using Kitsunemimi::Hanami::HanamiMessagingClient;
 using Kitsunemimi::Hanami::SupportedComponents;
@@ -231,25 +233,40 @@ sendData(const Kitsunemimi::DataBuffer* data,
 
     // prepare buffer
     uint64_t segmentSize = 96 * 1024;
-    memcpy(&sendBuffer[0], uuid.c_str(), 36);
-    memcpy(&sendBuffer[36], fileUuid.c_str(), 36);
+
+
+    Kitsunemimi::Hanami::FileUpload_Message message;
+    message.fileUuid = fileUuid;
+    message.datasetUuid = uuid;
+    message.type = Kitsunemimi::Hanami::FileUpload_Message::UploadDataType::CLUSTER_SNAPSHOT_TYPE;
+    message.isLast = false;
 
     do
     {
         pos = i + targetPos;
-        memcpy(&sendBuffer[72], &pos, 8);
 
         // check the size for the last segment
         segmentSize = 96 * 1024;
-        if(dataSize - i < segmentSize) {
+        if(dataSize - i < segmentSize)
+        {
             segmentSize = dataSize - i;
+            message.isLast = true;
         }
 
         // read segment of the local file
-        memcpy(&sendBuffer[80], &u8Data[i], segmentSize);
+        message.position = pos;
+        message.payload = const_cast<void*>(static_cast<const void*>(&u8Data[i]));
+        message.numberOfBytes = segmentSize;
+
+        const uint64_t msgSize = message.createBlob(sendBuffer, 128*1024);
+        if(msgSize == 0)
+        {
+            error.addMeesage("Failed to serialize learn-message");
+            return false;
+        }
 
         // send segment
-        if(client->sendStreamMessage(sendBuffer, segmentSize + 80, false, error) == false)
+        if(client->sendStreamMessage(sendBuffer, msgSize, false, error) == false)
         {
             error.addMeesage("Failed to send part with position '"
                              + std::to_string(i)

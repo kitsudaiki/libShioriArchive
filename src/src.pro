@@ -79,7 +79,8 @@ HEADERS += \
     ../include/libSagiriArchive/datasets.h \
     ../include/libSagiriArchive/other.h \
     ../include/libSagiriArchive/sagiri_messages.h \
-    ../include/libSagiriArchive/snapshots.h
+    ../include/libSagiriArchive/snapshots.h \
+    ../../libKitsunemimiHanamiMessages/hanami_messages/sagiri_messages.h
 
 SOURCES += \
     datasets.cpp \
