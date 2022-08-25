@@ -115,7 +115,7 @@ public:
     AuditLog_Message();
     ~AuditLog_Message();
 
-    std::string userUuid = "";
+    std::string userId = "";
     std::string component = "";
     std::string endpoint = "";
     std::string type = "";

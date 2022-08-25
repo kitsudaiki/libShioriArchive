@@ -324,7 +324,7 @@ AuditLog_Message::read(void* data, const uint64_t dataSize)
         return false;
     }
 
-    if(readString(data, userUuid) == false) {
+    if(readString(data, userId) == false) {
         return false;
     }
     if(readString(data, component) == false) {
@@ -350,7 +350,7 @@ AuditLog_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
                                   + 4 * sizeof(Entry)
-                                  + userUuid.size()
+                                  + userId.size()
                                   + component.size()
                                   + endpoint.size()
                                   + type.size();
@@ -361,7 +361,7 @@ AuditLog_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
 
     uint64_t pos = 0;
     pos += initBlob(&result[pos], totalMsgSize);
-    pos += appendString(&result[pos], userUuid);
+    pos += appendString(&result[pos], userId);
     pos += appendString(&result[pos], component);
     pos += appendString(&result[pos], endpoint);
     pos += appendString(&result[pos], type);

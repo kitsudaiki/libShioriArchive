@@ -149,7 +149,7 @@ runInitProcess(std::string &fileUuid,
     requestMsg.id = "v1/cluster_snapshot";
     requestMsg.httpType = Kitsunemimi::Hanami::HttpRequestType::POST_TYPE;
     requestMsg.inputValues = "";
-    requestMsg.inputValues.append("{\"user_uuid\":\"");
+    requestMsg.inputValues.append("{\"user_id\":\"");
     requestMsg.inputValues.append(userUuid);
     requestMsg.inputValues.append("\",\"token\":\"");
     requestMsg.inputValues.append(token);
@@ -157,7 +157,7 @@ runInitProcess(std::string &fileUuid,
     requestMsg.inputValues.append(snapshotUuid);
     requestMsg.inputValues.append("\",\"header\":");
     requestMsg.inputValues.append(headerMessage);
-    requestMsg.inputValues.append(",\"project_uuid\":\"");
+    requestMsg.inputValues.append(",\"project_id\":\"");
     requestMsg.inputValues.append(projectUuid);
     requestMsg.inputValues.append("\",\"name\":\"");
     requestMsg.inputValues.append(snapshotName);
@@ -317,11 +317,11 @@ runFinalizeProcess(const std::string &snapshotUuid,
     requestMsg.id = "v1/cluster_snapshot";
     requestMsg.httpType = Kitsunemimi::Hanami::HttpRequestType::PUT_TYPE;
     requestMsg.inputValues = "";
-    requestMsg.inputValues.append("{\"user_uuid\":\"");
+    requestMsg.inputValues.append("{\"user_id\":\"");
     requestMsg.inputValues.append(userUuid);
     requestMsg.inputValues.append("\",\"token\":\"");
     requestMsg.inputValues.append(token);
-    requestMsg.inputValues.append("\",\"project_uuid\":\"");
+    requestMsg.inputValues.append("\",\"project_id\":\"");
     requestMsg.inputValues.append(projectUuid);
     requestMsg.inputValues.append("\",\"uuid\":\"");
     requestMsg.inputValues.append(snapshotUuid);
