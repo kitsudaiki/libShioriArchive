@@ -72,11 +72,11 @@ sendResults(const std::string &uuid,
 /**
  * @brief send error-message to sagiri
  *
- * @param userUuid uuid of the user where the error belongs to
+ * @param userId id of the user where the error belongs to
  * @param errorMessage error-message to send to sagiri
  */
 void
-sendErrorMessage(const std::string &userUuid,
+sendErrorMessage(const std::string &userId,
                  const std::string &errorMessage)
 {
     // create message
@@ -87,7 +87,7 @@ sendErrorMessage(const std::string &userUuid,
     }
 
     Kitsunemimi::Hanami::ErrorLog_Message msg;
-    msg.userUuid = userUuid;
+    msg.userId = userId;
     msg.errorMsg = errorMessage;
     uint8_t buffer[96*1024];
     const uint64_t size = msg.createBlob(buffer, 96*1024);
@@ -101,13 +101,13 @@ sendErrorMessage(const std::string &userUuid,
  *
  * @param targetComponent accessed component
  * @param targetEndpoint accessed endpoint
- * @param userUuid user-uuid who made the request to the endpoint
+ * @param userId user-id who made the request to the endpoint
  * @param requestType http-type of the request
  */
 void
 sendAuditMessage(const std::string &targetComponent,
                  const std::string &targetEndpoint,
-                 const std::string &userUuid,
+                 const std::string &userId,
                  const Kitsunemimi::Hanami::HttpRequestType requestType)
 {
     // check if sagiri is supported
@@ -144,7 +144,7 @@ sendAuditMessage(const std::string &targetComponent,
     }
 
     AuditLog_Message msg;
-    msg.userUuid = userUuid;
+    msg.userId = userId;
     msg.type = httpType;
     msg.component = targetComponent;
     msg.endpoint = targetEndpoint;
