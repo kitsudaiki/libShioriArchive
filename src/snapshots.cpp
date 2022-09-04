@@ -24,8 +24,8 @@
 #include <libSagiriArchive/sagiri_messages.h>
 
 #include <libKitsunemimiHanamiCommon/component_support.h>
-#include <libKitsunemimiHanamiMessaging/hanami_messaging.h>
-#include <libKitsunemimiHanamiMessaging/hanami_messaging_client.h>
+#include <libKitsunemimiHanamiNetwork/hanami_messaging.h>
+#include <libKitsunemimiHanamiNetwork/hanami_messaging_client.h>
 
 #include <../../libKitsunemimiHanamiMessages/hanami_messages/sagiri_messages.h>
 
