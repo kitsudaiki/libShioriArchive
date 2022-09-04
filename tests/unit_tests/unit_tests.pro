@@ -79,10 +79,10 @@ LIBS += -L../../../libKitsunemimiCommon/src/debug -lKitsunemimiCommon
 LIBS += -L../../../libKitsunemimiCommon/src/release -lKitsunemimiCommon
 INCLUDEPATH += ../../../libKitsunemimiCommon/include
 
-LIBS += -L../../../libKitsunemimiHanamiMessaging/src -lKitsunemimiHanamiMessaging
-LIBS += -L../../../libKitsunemimiHanamiMessaging/src/debug -lKitsunemimiHanamiMessaging
-LIBS += -L../../../libKitsunemimiHanamiMessaging/src/release -lKitsunemimiHanamiMessaging
-INCLUDEPATH += ../../../libKitsunemimiHanamiMessaging/include
+LIBS += -L../../../libKitsunemimiHanamiNetwork/src -lKitsunemimiHanamiMessaging
+LIBS += -L../../../libKitsunemimiHanamiNetwork/src/debug -lKitsunemimiHanamiMessaging
+LIBS += -L../../../libKitsunemimiHanamiNetwork/src/release -lKitsunemimiHanamiMessaging
+INCLUDEPATH += ../../../libKitsunemimiHanamiNetwork/include
 
 LIBS += -lssl -lcryptopp -lcrypto
 
