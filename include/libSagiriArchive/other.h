@@ -40,6 +40,9 @@ namespace Sagiri
 {
 
 bool sendResults(const std::string &uuid,
+                 const std::string &name,
+                 const std::string &userId,
+                 const std::string &projectId,
                  const Kitsunemimi::DataArray &results,
                  Kitsunemimi::ErrorContainer &error);
 

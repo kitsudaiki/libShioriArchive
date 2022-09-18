@@ -260,6 +260,15 @@ ResultPush_Message::read(void* data, const uint64_t dataSize)
     if(readString(data, uuid) == false) {
         return false;
     }
+    if(readString(data, name) == false) {
+        return false;
+    }
+    if(readString(data, userId) == false) {
+        return false;
+    }
+    if(readString(data, projectId) == false) {
+        return false;
+    }
     if(readString(data, results) == false) {
         return false;
     }
@@ -276,8 +285,11 @@ uint64_t
 ResultPush_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
 {
     const uint64_t totalMsgSize = sizeof(MessageHeader)
-                                  + 2 * sizeof(Entry)
+                                  + 5 * sizeof(Entry)
                                   + uuid.size()
+                                  + name.size()
+                                  + userId.size()
+                                  + projectId.size()
                                   + results.size();
 
     if(bufferSize < totalMsgSize) {
@@ -287,6 +299,9 @@ ResultPush_Message::createBlob(uint8_t* result, const uint64_t bufferSize)
     uint64_t pos = 0;
     pos += initBlob(&result[pos], totalMsgSize);
     pos += appendString(&result[pos], uuid);
+    pos += appendString(&result[pos], name);
+    pos += appendString(&result[pos], userId);
+    pos += appendString(&result[pos], projectId);
     pos += appendString(&result[pos], results);
 
     assert(pos == totalMsgSize);
