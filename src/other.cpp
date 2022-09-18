@@ -42,6 +42,7 @@ namespace Sagiri
  * @brief send list with request-results to sagiri
  *
  * @param uuid uuid of the request-task
+ * @param name name of the request-task
  * @param results data-array with results
  * @param error reference for error-output
  *
@@ -49,6 +50,9 @@ namespace Sagiri
  */
 bool
 sendResults(const std::string &uuid,
+            const std::string &name,
+            const std::string &userId,
+            const std::string &projectId,
             const Kitsunemimi::DataArray &results,
             Kitsunemimi::ErrorContainer &error)
 {
@@ -57,11 +61,17 @@ sendResults(const std::string &uuid,
         return false;
     }
 
+    // fill message
     ResultPush_Message msg;
     msg.uuid = uuid;
+    msg.name = name;
+    msg.userId = userId;
+    msg.projectId = projectId;
     msg.results = results.toString();
-    uint8_t buffer[96*1024];
-    const uint64_t size = msg.createBlob(buffer, 96*1024);
+
+    // TODO: variable size
+    uint8_t buffer[1024*1024];
+    const uint64_t size = msg.createBlob(buffer, 1024*1024);
 
     Kitsunemimi::DataBuffer* ret = client->sendGenericRequest(buffer, size, error);
     delete ret;

@@ -100,6 +100,9 @@ public:
     ~ResultPush_Message();
 
     std::string uuid = "";
+    std::string name = "";
+    std::string userId = "";
+    std::string projectId = "";
     std::string results;
 
     bool read(void* data, const uint64_t dataSize);
