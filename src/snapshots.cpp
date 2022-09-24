@@ -115,8 +115,8 @@ getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
  * @param fileUuid uuid of the temporary file of the snapshot in shiori
  * @param snapshotUuid uuid of the new snapshot, which should be the same like the task-uuid
  * @param snapshotName name of the new snapshot
- * @param userUuid uuid of the user who owns the snapshot
- * @param projectUuid uuid of the project in with the snapshot was created
+ * @param userId id of the user who owns the snapshot
+ * @param projectId id of the project in with the snapshot was created
  * @param totalSize total size of the snapshot
  * @param headerMessage header-message with meta-information of the snapshot
  * @param token access-token for shiori
@@ -125,15 +125,15 @@ getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
  * @return true, if successful, else false
  */
 bool
-runInitProcess(std::string &fileUuid,
-               const std::string &snapshotUuid,
-               const std::string &snapshotName,
-               const std::string &userUuid,
-               const std::string &projectUuid,
-               const uint64_t totalSize,
-               const std::string &headerMessage,
-               const std::string &token,
-               Kitsunemimi::ErrorContainer &error)
+runSnapshotInitProcess(std::string &fileUuid,
+                       const std::string &snapshotUuid,
+                       const std::string &snapshotName,
+                       const std::string &userId,
+                       const std::string &projectId,
+                       const uint64_t totalSize,
+                       const std::string &headerMessage,
+                       const std::string &token,
+                       Kitsunemimi::ErrorContainer &error)
 {
     // get internal client for interaction with shiori
     HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
@@ -150,7 +150,7 @@ runInitProcess(std::string &fileUuid,
     requestMsg.httpType = Kitsunemimi::Hanami::HttpRequestType::POST_TYPE;
     requestMsg.inputValues = "";
     requestMsg.inputValues.append("{\"user_id\":\"");
-    requestMsg.inputValues.append(userUuid);
+    requestMsg.inputValues.append(userId);
     requestMsg.inputValues.append("\",\"token\":\"");
     requestMsg.inputValues.append(token);
     requestMsg.inputValues.append("\",\"uuid\":\"");
@@ -158,7 +158,7 @@ runInitProcess(std::string &fileUuid,
     requestMsg.inputValues.append("\",\"header\":");
     requestMsg.inputValues.append(headerMessage);
     requestMsg.inputValues.append(",\"project_id\":\"");
-    requestMsg.inputValues.append(projectUuid);
+    requestMsg.inputValues.append(projectId);
     requestMsg.inputValues.append("\",\"name\":\"");
     requestMsg.inputValues.append(snapshotName);
     requestMsg.inputValues.append("\",\"input_data_size\":");
@@ -289,19 +289,19 @@ sendData(const Kitsunemimi::DataBuffer* data,
  * @param snapshotUuid uuid of the snapshot to finalize
  * @param fileUuid uuid of the temporary file of the snapshot in shiori
  * @param token access-token for shiori
- * @param userUuid uuid of the user who owns the snapshot
- * @param projectUuid uuid of the project in with the snapshot was created
+ * @param userId id of the user who owns the snapshot
+ * @param projectId id of the project in with the snapshot was created
  * @param error reference for error-output
  *
  * @return true, if successful, else false
  */
 bool
-runFinalizeProcess(const std::string &snapshotUuid,
-                   const std::string &fileUuid,
-                   const std::string &token,
-                   const std::string &userUuid,
-                   const std::string &projectUuid,
-                   Kitsunemimi::ErrorContainer &error)
+runSnapshotFinalizeProcess(const std::string &snapshotUuid,
+                           const std::string &fileUuid,
+                           const std::string &token,
+                           const std::string &userId,
+                           const std::string &projectId,
+                           Kitsunemimi::ErrorContainer &error)
 {
     // get internal client for interaction with shiori
     HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
@@ -318,11 +318,11 @@ runFinalizeProcess(const std::string &snapshotUuid,
     requestMsg.httpType = Kitsunemimi::Hanami::HttpRequestType::PUT_TYPE;
     requestMsg.inputValues = "";
     requestMsg.inputValues.append("{\"user_id\":\"");
-    requestMsg.inputValues.append(userUuid);
+    requestMsg.inputValues.append(userId);
     requestMsg.inputValues.append("\",\"token\":\"");
     requestMsg.inputValues.append(token);
     requestMsg.inputValues.append("\",\"project_id\":\"");
-    requestMsg.inputValues.append(projectUuid);
+    requestMsg.inputValues.append(projectId);
     requestMsg.inputValues.append("\",\"uuid\":\"");
     requestMsg.inputValues.append(snapshotUuid);
     requestMsg.inputValues.append("\",\"uuid_input_file\":\"");

@@ -47,15 +47,15 @@ bool getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
                             const std::string &token,
                             Kitsunemimi::ErrorContainer &error);
 
-bool runInitProcess(std::string &fileUuid,
-                    const std::string &snapshotUuid,
-                    const std::string &snapshotName,
-                    const std::string &userUuid,
-                    const std::string &projectUuid,
-                    const uint64_t totalSize,
-                    const std::string &headerMessage,
-                    const std::string &token,
-                    Kitsunemimi::ErrorContainer &error);
+bool runSnapshotInitProcess(std::string &fileUuid,
+                            const std::string &snapshotUuid,
+                            const std::string &snapshotName,
+                            const std::string &userId,
+                            const std::string &projectId,
+                            const uint64_t totalSize,
+                            const std::string &headerMessage,
+                            const std::string &token,
+                            Kitsunemimi::ErrorContainer &error);
 
 bool sendData(const Kitsunemimi::DataBuffer* data,
               uint64_t &targetPos,
@@ -63,12 +63,12 @@ bool sendData(const Kitsunemimi::DataBuffer* data,
               const std::string &fileUuid,
               Kitsunemimi::ErrorContainer &error);
 
-bool runFinalizeProcess(const std::string &snapshotUuid,
-                        const std::string &fileUuid,
-                        const std::string &token,
-                        const std::string &userUuid,
-                        const std::string &projectUuid,
-                        Kitsunemimi::ErrorContainer &error);
+bool runSnapshotFinalizeProcess(const std::string &snapshotUuid,
+                                const std::string &fileUuid,
+                                const std::string &token,
+                                const std::string &userId,
+                                const std::string &projectId,
+                                Kitsunemimi::ErrorContainer &error);
 }
 
 #endif // KITSUNEMIMI_HANAMI_SHIORI_SNAPSHOTS_H
