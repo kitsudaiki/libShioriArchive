@@ -1,5 +1,5 @@
 /**
- * @file        sagiri_messages.h
+ * @file        shiori_messages.h
  *
  * @author      Tobias Anker <tobias.anker@kitsunemimi.moe>
  *
@@ -20,18 +20,18 @@
  *      limitations under the License.
  */
 
-#ifndef SAGIRIMESSAGES_H
-#define SAGIRIMESSAGES_H
+#ifndef SHIORIMESSAGES_H
+#define SHIORIMESSAGES_H
 
 #include <libKitsunemimiHanamiCommon/messages.h>
 
 using Kitsunemimi::Hanami::HanamiMessage;
 using Kitsunemimi::DataBuffer;
 
-namespace Sagiri
+namespace Shiori
 {
 
-enum SagiriMessageTypes
+enum ShioriMessageTypes
 {
     UNDEFINED_MESSAGE_TYPE = 0,
     DATASET_REQUEST_MESSAGE_TYPE = 1,
@@ -131,4 +131,4 @@ public:
 
 }
 
-#endif // SAGIRIMESSAGES_H
+#endif // SHIORIMESSAGES_H

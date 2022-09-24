@@ -111,9 +111,9 @@ echo "##########################################################################
 #-----------------------------------------------------------------------------------------------------------------
 
 if [ $1 = "test" ]; then
-    build_kitsune_lib_repo "libSagiriArchive" 8 "run_tests"
+    build_kitsune_lib_repo "libShioriArchive" 8 "run_tests"
 else
-    build_kitsune_lib_repo "libSagiriArchive" 8
+    build_kitsune_lib_repo "libShioriArchive" 8
 fi
 
 #-----------------------------------------------------------------------------------------------------------------

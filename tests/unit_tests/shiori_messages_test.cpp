@@ -20,12 +20,12 @@
  *      limitations under the License.
  */
 
-#include "sagiri_messages_test.h"
+#include "shiori_messages_test.h"
 
-#include <libSagiriArchive/sagiri_messages.h>
+#include <libShioriArchive/shiori_messages.h>
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
 
-namespace Sagiri
+namespace Shiori
 {
 
 HanamiMessages_Test::HanamiMessages_Test()
@@ -63,4 +63,4 @@ HanamiMessages_Test::clusterSnapshot_test()
     TEST_EQUAL(compareRet, 0);
 }
 
-}  // namespace Sagiri
+}  // namespace Shiori

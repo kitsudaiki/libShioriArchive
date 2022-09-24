@@ -5,7 +5,7 @@ QT -= qt core gui
 CONFIG   -= app_bundle
 CONFIG += c++17 console
 
-LIBS += -L../../src -lSagiriArchive
+LIBS += -L../../src -lShioriArchive
 INCLUDEPATH += $$PWD
 
 
@@ -88,7 +88,7 @@ LIBS += -lssl -lcryptopp -lcrypto
 
 SOURCES += \
     main.cpp  \
-    sagiri_messages_test.cpp
+    shiori_messages_test.cpp
 
 HEADERS += \
-    sagiri_messages_test.h
+    shiori_messages_test.h

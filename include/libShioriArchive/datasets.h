@@ -20,8 +20,8 @@
  *      limitations under the License.
  */
 
-#ifndef KITSUNEMIMI_HANAMI_SAGIRI_DATASETS_H
-#define KITSUNEMIMI_HANAMI_SAGIRI_DATASETS_H
+#ifndef KITSUNEMIMI_HANAMI_SHIORI_DATASETS_H
+#define KITSUNEMIMI_HANAMI_SHIORI_DATASETS_H
 
 #include <string>
 
@@ -36,7 +36,7 @@ class JsonItem;
 }
 }
 
-namespace Sagiri
+namespace Shiori
 {
 
 Kitsunemimi::DataBuffer* getDatasetData(const std::string &token,
@@ -50,4 +50,4 @@ bool getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
                            Kitsunemimi::ErrorContainer &error);
 }
 
-#endif // KITSUNEMIMI_HANAMI_SAGIRI_DATASETS_H
+#endif // KITSUNEMIMI_HANAMI_SHIORI_DATASETS_H

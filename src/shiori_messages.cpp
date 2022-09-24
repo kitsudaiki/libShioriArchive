@@ -1,5 +1,5 @@
 /**
- * @file        sagiri_messages.cpp
+ * @file        shiori_messages.cpp
  *
  * @author      Tobias Anker <tobias.anker@kitsunemimi.moe>
  *
@@ -20,9 +20,9 @@
  *      limitations under the License.
  */
 
-#include <libSagiriArchive/sagiri_messages.h>
+#include <libShioriArchive/shiori_messages.h>
 
-namespace Sagiri
+namespace Shiori
 {
 
 //==================================================================================================

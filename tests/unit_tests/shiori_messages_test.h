@@ -20,14 +20,14 @@
  *      limitations under the License.
  */
 
-#ifndef SAGIRIRMESSAGES_TEST_H
-#define SAGIRIRMESSAGES_TEST_H
+#ifndef SHIROIMESSAGES_TEST_H
+#define SHIROIMESSAGES_TEST_H
 
 #include <stdio.h>
 #include <string.h>
 #include <libKitsunemimiCommon/test_helper/compare_test_helper.h>
 
-namespace Sagiri
+namespace Shiori
 {
 
 class HanamiMessages_Test
@@ -40,6 +40,6 @@ private:
     void clusterSnapshot_test();
 };
 
-}  // namespace Sagiri
+}  // namespace Shiori
 
-#endif // SAGIRIRMESSAGES_TEST_H
+#endif // SHIROIMESSAGES_TEST_H

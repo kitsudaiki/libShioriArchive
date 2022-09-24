@@ -20,8 +20,8 @@
  *      limitations under the License.
  */
 
-#ifndef KITSUNEMIMI_HANAMI_SAGIRI_OTHER_H
-#define KITSUNEMIMI_HANAMI_SAGIRI_OTHER_H
+#ifndef KITSUNEMIMI_HANAMI_SHIORI_OTHER_H
+#define KITSUNEMIMI_HANAMI_SHIORI_OTHER_H
 
 #include <string>
 
@@ -36,7 +36,7 @@ class JsonItem;
 }
 }
 
-namespace Sagiri
+namespace Shiori
 {
 
 bool sendResults(const std::string &uuid,
@@ -56,4 +56,4 @@ void sendAuditMessage(const std::string &targetComponent,
 
 }
 
-#endif // KITSUNEMIMI_HANAMI_SAGIRI_OTHER_H
+#endif // KITSUNEMIMI_HANAMI_SHIORI_OTHER_H
