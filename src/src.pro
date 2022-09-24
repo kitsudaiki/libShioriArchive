@@ -1,6 +1,6 @@
 QT -= qt core gui
 
-TARGET = SagiriArchive
+TARGET = ShioriArchive
 CONFIG += c++17
 TEMPLATE = lib
 VERSION = 0.2.0
@@ -76,14 +76,14 @@ INCLUDEPATH += $$PWD \
                $$PWD/../include
 
 HEADERS += \
-    ../include/libSagiriArchive/datasets.h \
-    ../include/libSagiriArchive/other.h \
-    ../include/libSagiriArchive/sagiri_messages.h \
-    ../include/libSagiriArchive/snapshots.h \
-    ../../libKitsunemimiHanamiMessages/hanami_messages/sagiri_messages.h
+    ../include/libShioriArchive/datasets.h \
+    ../include/libShioriArchive/other.h \
+    ../include/libShioriArchive/shiori_messages.h \
+    ../include/libShioriArchive/snapshots.h \
+    ../../libKitsunemimiHanamiMessages/hanami_messages/shiori_messages.h
 
 SOURCES += \
     datasets.cpp \
     other.cpp \
-    sagiri_messages.cpp \
+    shiori_messages.cpp \
     snapshots.cpp

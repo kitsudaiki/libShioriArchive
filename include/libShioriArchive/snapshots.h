@@ -20,8 +20,8 @@
  *      limitations under the License.
  */
 
-#ifndef KITSUNEMIMI_HANAMI_SAGIRI_SNAPSHOTS_H
-#define KITSUNEMIMI_HANAMI_SAGIRI_SNAPSHOTS_H
+#ifndef KITSUNEMIMI_HANAMI_SHIORI_SNAPSHOTS_H
+#define KITSUNEMIMI_HANAMI_SHIORI_SNAPSHOTS_H
 
 #include <string>
 
@@ -36,7 +36,7 @@ class JsonItem;
 }
 }
 
-namespace Sagiri
+namespace Shiori
 {
 
 Kitsunemimi::DataBuffer* getSnapshotData(const std::string &location,
@@ -71,4 +71,4 @@ bool runFinalizeProcess(const std::string &snapshotUuid,
                         Kitsunemimi::ErrorContainer &error);
 }
 
-#endif // KITSUNEMIMI_HANAMI_SAGIRI_SNAPSHOTS_H
+#endif // KITSUNEMIMI_HANAMI_SHIORI_SNAPSHOTS_H

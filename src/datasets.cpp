@@ -20,8 +20,8 @@
  *      limitations under the License.
  */
 
-#include <libSagiriArchive/datasets.h>
-#include <libSagiriArchive/sagiri_messages.h>
+#include <libShioriArchive/datasets.h>
+#include <libShioriArchive/shiori_messages.h>
 
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
 #include <libKitsunemimiCrypto/common.h>
@@ -35,11 +35,11 @@ using Kitsunemimi::Hanami::HanamiMessaging;
 using Kitsunemimi::Hanami::HanamiMessagingClient;
 using Kitsunemimi::Hanami::SupportedComponents;
 
-namespace Sagiri
+namespace Shiori
 {
 
 /**
- * @brief get data-set payload from sagiri
+ * @brief get data-set payload from shiori
  *
  * @param token token for request
  * @param uuid uuid of the data-set to download
@@ -54,9 +54,9 @@ getDatasetData(const std::string &token,
                Kitsunemimi::ErrorContainer &error)
 {
     Kitsunemimi::Hanami::ResponseMessage response;
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
 
-    // build request to get train-data from sagiri
+    // build request to get train-data from shiori
     Kitsunemimi::Hanami::RequestMessage request;
     request.id = "v1/data_set";
     request.httpType = Kitsunemimi::Hanami::GET_TYPE;
@@ -68,7 +68,7 @@ getDatasetData(const std::string &token,
         return nullptr;
     }
 
-    // send request to sagiri
+    // send request to shiori
     if(client->triggerSakuraFile(response, request, error) == false) {
         return nullptr;
     }
@@ -97,11 +97,11 @@ getDatasetData(const std::string &token,
 }
 
 /**
- * @brief get information of a specific data-set from sagiri
+ * @brief get information of a specific data-set from shiori
  *
  * @param result reference for result-output
  * @param dataSetUuid uuid of the requested data-set
- * @param token for authetification against sagiri
+ * @param token for authetification against shiori
  * @param error reference for error-output
  *
  * @return true, if successful, else false
@@ -112,7 +112,7 @@ getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
                       const std::string &token,
                       Kitsunemimi::ErrorContainer &error)
 {
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
     if(client == nullptr) {
         return false;
     }

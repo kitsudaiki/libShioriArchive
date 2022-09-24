@@ -20,10 +20,10 @@
  *      limitations under the License.
  */
 
-#include <sagiri_messages_test.h>
+#include <shiori_messages_test.h>
 
 int main()
 {
-    Sagiri::HanamiMessages_Test();
+    Shiori::HanamiMessages_Test();
     return 0;
 }

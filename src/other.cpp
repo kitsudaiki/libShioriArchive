@@ -20,8 +20,8 @@
  *      limitations under the License.
  */
 
-#include <libSagiriArchive/other.h>
-#include <libSagiriArchive/sagiri_messages.h>
+#include <libShioriArchive/other.h>
+#include <libShioriArchive/shiori_messages.h>
 
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
 #include <libKitsunemimiCrypto/common.h>
@@ -35,11 +35,11 @@ using Kitsunemimi::Hanami::HanamiMessaging;
 using Kitsunemimi::Hanami::HanamiMessagingClient;
 using Kitsunemimi::Hanami::SupportedComponents;
 
-namespace Sagiri
+namespace Shiori
 {
 
 /**
- * @brief send list with request-results to sagiri
+ * @brief send list with request-results to shiori
  *
  * @param uuid uuid of the request-task
  * @param name name of the request-task
@@ -56,7 +56,7 @@ sendResults(const std::string &uuid,
             const Kitsunemimi::DataArray &results,
             Kitsunemimi::ErrorContainer &error)
 {
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
     if(client == nullptr) {
         return false;
     }
@@ -80,10 +80,10 @@ sendResults(const std::string &uuid,
 }
 
 /**
- * @brief send error-message to sagiri
+ * @brief send error-message to shiori
  *
  * @param userId id of the user where the error belongs to
- * @param errorMessage error-message to send to sagiri
+ * @param errorMessage error-message to send to shiori
  */
 void
 sendErrorMessage(const std::string &userId,
@@ -91,7 +91,7 @@ sendErrorMessage(const std::string &userId,
 {
     // create message
     Kitsunemimi::ErrorContainer error;
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
     if(client == nullptr) {
         return;
     }
@@ -107,7 +107,7 @@ sendErrorMessage(const std::string &userId,
 }
 
 /**
- * @brief send audit-log-entry to sagiri
+ * @brief send audit-log-entry to shiori
  *
  * @param targetComponent accessed component
  * @param targetEndpoint accessed endpoint
@@ -120,8 +120,8 @@ sendAuditMessage(const std::string &targetComponent,
                  const std::string &userId,
                  const Kitsunemimi::Hanami::HttpRequestType requestType)
 {
-    // check if sagiri is supported
-    if(SupportedComponents::getInstance()->support[Kitsunemimi::Hanami::SAGIRI] == false) {
+    // check if shiori is supported
+    if(SupportedComponents::getInstance()->support[Kitsunemimi::Hanami::SHIORI] == false) {
         return;
     }
 
@@ -148,7 +148,7 @@ sendAuditMessage(const std::string &targetComponent,
 
     // send
     Kitsunemimi::ErrorContainer error;
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
     if(client == nullptr) {
         return;
     }

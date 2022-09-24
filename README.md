@@ -1,2 +1,2 @@
-# libSagiriArchive
+# libShioriArchive
 

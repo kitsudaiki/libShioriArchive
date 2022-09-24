@@ -20,26 +20,26 @@
  *      limitations under the License.
  */
 
-#include <libSagiriArchive/snapshots.h>
-#include <libSagiriArchive/sagiri_messages.h>
+#include <libShioriArchive/snapshots.h>
+#include <libShioriArchive/shiori_messages.h>
 
 #include <libKitsunemimiHanamiCommon/component_support.h>
 #include <libKitsunemimiHanamiNetwork/hanami_messaging.h>
 #include <libKitsunemimiHanamiNetwork/hanami_messaging_client.h>
 
-#include <../../libKitsunemimiHanamiMessages/hanami_messages/sagiri_messages.h>
+#include <../../libKitsunemimiHanamiMessages/hanami_messages/shiori_messages.h>
 
 using Kitsunemimi::Hanami::HanamiMessaging;
 using Kitsunemimi::Hanami::HanamiMessagingClient;
 using Kitsunemimi::Hanami::SupportedComponents;
 
-namespace Sagiri
+namespace Shiori
 {
 
 /**
- * @brief get data of a snapshot from sagiri
+ * @brief get data of a snapshot from shiori
  *
- * @param location file-location of the snapshot within sagiri
+ * @param location file-location of the snapshot within shiori
  * @param error reference for error-output
  *
  * @return pointer to buffer with the data of the snapshot
@@ -48,7 +48,7 @@ Kitsunemimi::DataBuffer*
 getSnapshotData(const std::string &location,
                 Kitsunemimi::ErrorContainer &error)
 {
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
 
     // create real request
     ClusterSnapshotPull_Message msg;
@@ -60,11 +60,11 @@ getSnapshotData(const std::string &location,
 }
 
 /**
- * @brief get information of a specific snapshot from sagiri
+ * @brief get information of a specific snapshot from shiori
  *
  * @param result reference for the output of the resulting json
  * @param snapshotUuid uuid of the requested snapshot
- * @param token access-token for sagiri
+ * @param token access-token for shiori
  * @param error reference for error-output
  *
  * @return true, if successful, else false
@@ -75,7 +75,7 @@ getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
                        const std::string &token,
                        Kitsunemimi::ErrorContainer &error)
 {
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
     if(client == nullptr) {
         return false;
     }
@@ -110,16 +110,16 @@ getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
 }
 
 /**
- * @brief initialize the transfer of the cluster-snapshot to sagiri
+ * @brief initialize the transfer of the cluster-snapshot to shiori
  *
- * @param fileUuid uuid of the temporary file of the snapshot in sagiri
+ * @param fileUuid uuid of the temporary file of the snapshot in shiori
  * @param snapshotUuid uuid of the new snapshot, which should be the same like the task-uuid
  * @param snapshotName name of the new snapshot
  * @param userUuid uuid of the user who owns the snapshot
  * @param projectUuid uuid of the project in with the snapshot was created
  * @param totalSize total size of the snapshot
  * @param headerMessage header-message with meta-information of the snapshot
- * @param token access-token for sagiri
+ * @param token access-token for shiori
  * @param error reference for error-output
  *
  * @return true, if successful, else false
@@ -135,12 +135,12 @@ runInitProcess(std::string &fileUuid,
                const std::string &token,
                Kitsunemimi::ErrorContainer &error)
 {
-    // get internal client for interaction with sagiri
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    // get internal client for interaction with shiori
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
     if(client == nullptr)
     {
-        error.addMeesage("Failed to get client to sagiri");
-        error.addSolution("Check if sagiri is correctly configured");
+        error.addMeesage("Failed to get client to shiori");
+        error.addSolution("Check if shiori is correctly configured");
         return false;
     }
 
@@ -169,7 +169,7 @@ runInitProcess(std::string &fileUuid,
     Kitsunemimi::Hanami::ResponseMessage response;
     if(client->triggerSakuraFile(response, requestMsg, error) == false)
     {
-        error.addMeesage("Failed to trigger blossom in sagiri to initialize "
+        error.addMeesage("Failed to trigger blossom in shiori to initialize "
                          "the transfer of a cluster");
         return false;
     }
@@ -178,7 +178,7 @@ runInitProcess(std::string &fileUuid,
     if(response.success == false)
     {
         error.addMeesage(response.responseContent);
-        error.addMeesage("Failed to trigger blossom in sagiri to initialize "
+        error.addMeesage("Failed to trigger blossom in shiori to initialize "
                          "the transfer of a cluster");
         return false;
     }
@@ -188,7 +188,7 @@ runInitProcess(std::string &fileUuid,
     Kitsunemimi::Json::JsonItem parsedResponse;
     if(parsedResponse.parse(response.responseContent, error) == false)
     {
-        error.addMeesage("Failed to parse reponse from sagiri for the initializing "
+        error.addMeesage("Failed to parse reponse from shiori for the initializing "
                          "of the snapshot-transfer");
         return false;
     }
@@ -198,12 +198,12 @@ runInitProcess(std::string &fileUuid,
 }
 
 /**
- * @brief send data of the snapshot to sagiri
+ * @brief send data of the snapshot to shiori
  *
  * @param data buffer with data to send
  * @param targetPos byte-position within the snapshot where the data belongs to
  * @param uuid uuid of the snapshot
- * @param fileUuid uuid of the temporary file in sagiri for identification
+ * @param fileUuid uuid of the temporary file in shiori for identification
  * @param error reference for error-output
  *
  * @return true, if successful, else false
@@ -215,12 +215,12 @@ sendData(const Kitsunemimi::DataBuffer* data,
          const std::string &fileUuid,
          Kitsunemimi::ErrorContainer &error)
 {
-    // get internal client for interaction with sagiri
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    // get internal client for interaction with shiori
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
     if(client == nullptr)
     {
-        error.addMeesage("Failed to get client to sagiri");
-        error.addSolution("Check if sagiri is correctly configured");
+        error.addMeesage("Failed to get client to shiori");
+        error.addSolution("Check if shiori is correctly configured");
         return false;
     }
 
@@ -270,7 +270,7 @@ sendData(const Kitsunemimi::DataBuffer* data,
         {
             error.addMeesage("Failed to send part with position '"
                              + std::to_string(i)
-                             + "' to sagiri");
+                             + "' to shiori");
             return false;
         }
 
@@ -284,11 +284,11 @@ sendData(const Kitsunemimi::DataBuffer* data,
 }
 
 /**
- * @brief finalize the transfer of the snapshot to sagiri
+ * @brief finalize the transfer of the snapshot to shiori
  *
  * @param snapshotUuid uuid of the snapshot to finalize
- * @param fileUuid uuid of the temporary file of the snapshot in sagiri
- * @param token access-token for sagiri
+ * @param fileUuid uuid of the temporary file of the snapshot in shiori
+ * @param token access-token for shiori
  * @param userUuid uuid of the user who owns the snapshot
  * @param projectUuid uuid of the project in with the snapshot was created
  * @param error reference for error-output
@@ -303,12 +303,12 @@ runFinalizeProcess(const std::string &snapshotUuid,
                    const std::string &projectUuid,
                    Kitsunemimi::ErrorContainer &error)
 {
-    // get internal client for interaction with sagiri
-    HanamiMessagingClient* client = HanamiMessaging::getInstance()->sagiriClient;
+    // get internal client for interaction with shiori
+    HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
     if(client == nullptr)
     {
-        error.addMeesage("Failed to get client to sagiri");
-        error.addSolution("Check if sagiri is correctly configured");
+        error.addMeesage("Failed to get client to shiori");
+        error.addSolution("Check if shiori is correctly configured");
         return false;
     }
 
@@ -333,7 +333,7 @@ runFinalizeProcess(const std::string &snapshotUuid,
     Kitsunemimi::Hanami::ResponseMessage response;
     if(client->triggerSakuraFile(response, requestMsg, error) == false)
     {
-        error.addMeesage("Failed to trigger blossom in sagiri to finalize "
+        error.addMeesage("Failed to trigger blossom in shiori to finalize "
                          "the transfer of a cluster");
         return false;
     }
@@ -342,7 +342,7 @@ runFinalizeProcess(const std::string &snapshotUuid,
     if(response.success == false)
     {
         error.addMeesage(response.responseContent);
-        error.addMeesage("Failed to trigger blossom in sagiri to finalize "
+        error.addMeesage("Failed to trigger blossom in shiori to finalize "
                          "the transfer of a cluster");
         return false;
     }
@@ -352,7 +352,7 @@ runFinalizeProcess(const std::string &snapshotUuid,
     Kitsunemimi::Json::JsonItem parsedResponse;
     if(parsedResponse.parse(response.responseContent, error) == false)
     {
-        error.addMeesage("Failed to parse reponse from sagiri for the finalizeing "
+        error.addMeesage("Failed to parse reponse from shiori for the finalizeing "
                          "of the snapshot-transfer");
         return false;
     }
