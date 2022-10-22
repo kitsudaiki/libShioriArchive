@@ -21,13 +21,15 @@
  */
 
 #include <libShioriArchive/snapshots.h>
-#include <libShioriArchive/shiori_messages.h>
+
+#include <libKitsunemimiCommon/buffer/data_buffer.h>
 
 #include <libKitsunemimiHanamiCommon/component_support.h>
 #include <libKitsunemimiHanamiNetwork/hanami_messaging.h>
 #include <libKitsunemimiHanamiNetwork/hanami_messaging_client.h>
 
-#include <../../libKitsunemimiHanamiMessages/hanami_messages/shiori_messages.h>
+#include <../../libKitsunemimiHanamiMessages/protobuffers/shiori_messages.proto3.pb.h>
+#include <../../libKitsunemimiHanamiMessages/message_sub_types.h>
 
 using Kitsunemimi::Hanami::HanamiMessaging;
 using Kitsunemimi::Hanami::HanamiMessagingClient;
@@ -42,7 +44,7 @@ namespace Shiori
  * @param location file-location of the snapshot within shiori
  * @param error reference for error-output
  *
- * @return pointer to buffer with the data of the snapshot
+ * @return pointer to buffer with the data of the snapshot, if successful, else nullptr
  */
 Kitsunemimi::DataBuffer*
 getSnapshotData(const std::string &location,
@@ -50,13 +52,24 @@ getSnapshotData(const std::string &location,
 {
     HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
 
-    // create real request
+    // create message
     ClusterSnapshotPull_Message msg;
-    msg.location = location;
-    uint8_t buffer[96*1024];
-    const uint64_t size = msg.createBlob(buffer, 96*1024);
+    msg.set_location(location);
 
-    return client->sendGenericRequest(buffer, size, error);
+    // serialize message
+    uint8_t buffer[96*1024];
+    const uint64_t msgSize = msg.ByteSizeLong();
+    if(msg.SerializeToArray(buffer, msgSize) == false)
+    {
+        error.addMeesage("Failed to serialize message");
+        return nullptr;
+    }
+
+    // send message
+    return client->sendGenericRequest(SHIORI_CLUSTER_SNAPSHOT_PULL_MESSAGE_TYPE,
+                                      buffer,
+                                      msgSize,
+                                      error);
 }
 
 /**
@@ -234,32 +247,30 @@ sendData(const Kitsunemimi::DataBuffer* data,
     // prepare buffer
     uint64_t segmentSize = 96 * 1024;
 
-
-    Kitsunemimi::Hanami::FileUpload_Message message;
-    message.fileUuid = fileUuid;
-    message.datasetUuid = uuid;
-    message.type = Kitsunemimi::Hanami::FileUpload_Message::UploadDataType::CLUSTER_SNAPSHOT_TYPE;
-    message.isLast = false;
-
     do
     {
         pos = i + targetPos;
+
+        FileUpload_Message message;
+        message.set_fileuuid(fileUuid);
+        message.set_datasetuuid(uuid);
+        message.set_type(UploadDataType::CLUSTER_SNAPSHOT_TYPE);
+        message.set_islast(false);
 
         // check the size for the last segment
         segmentSize = 96 * 1024;
         if(dataSize - i < segmentSize)
         {
             segmentSize = dataSize - i;
-            message.isLast = true;
+            message.set_islast(true);
         }
 
         // read segment of the local file
-        message.position = pos;
-        message.payload = const_cast<void*>(static_cast<const void*>(&u8Data[i]));
-        message.numberOfBytes = segmentSize;
+        message.set_position(pos);
+        message.set_data(static_cast<const void*>(&u8Data[i]), segmentSize);
 
-        const uint64_t msgSize = message.createBlob(sendBuffer, 128*1024);
-        if(msgSize == 0)
+        const uint64_t msgSize = message.ByteSizeLong();
+        if(message.SerializeToArray(sendBuffer, msgSize) == false)
         {
             error.addMeesage("Failed to serialize learn-message");
             return false;

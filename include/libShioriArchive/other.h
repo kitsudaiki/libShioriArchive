@@ -46,13 +46,15 @@ bool sendResults(const std::string &uuid,
                  const Kitsunemimi::DataArray &results,
                  Kitsunemimi::ErrorContainer &error);
 
-void sendErrorMessage(const std::string &userUuid,
-                      const std::string &errorMessage);
+bool sendErrorMessage(const std::string &userUuid,
+                      const std::string &errorMessage,
+                      Kitsunemimi::ErrorContainer &error);
 
-void sendAuditMessage(const std::string &targetComponent,
+bool sendAuditMessage(const std::string &targetComponent,
                       const std::string &targetEndpoint,
-                      const std::string &userUuid,
-                      const Kitsunemimi::Hanami::HttpRequestType requestType);
+                      const std::string &userId,
+                      const Kitsunemimi::Hanami::HttpRequestType requestType,
+                      Kitsunemimi::ErrorContainer &error);
 
 }
 

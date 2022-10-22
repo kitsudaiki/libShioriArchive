@@ -21,15 +21,18 @@
  */
 
 #include <libShioriArchive/other.h>
-#include <libShioriArchive/shiori_messages.h>
 
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
+#include <libKitsunemimiCommon/logger.h>
 #include <libKitsunemimiCrypto/common.h>
 
 #include <libKitsunemimiHanamiCommon/component_support.h>
 #include <libKitsunemimiHanamiCommon/structs.h>
 #include <libKitsunemimiHanamiNetwork/hanami_messaging.h>
 #include <libKitsunemimiHanamiNetwork/hanami_messaging_client.h>
+
+#include <../../libKitsunemimiHanamiMessages/protobuffers/shiori_messages.proto3.pb.h>
+#include <../../libKitsunemimiHanamiMessages/message_sub_types.h>
 
 using Kitsunemimi::Hanami::HanamiMessaging;
 using Kitsunemimi::Hanami::HanamiMessagingClient;
@@ -56,25 +59,46 @@ sendResults(const std::string &uuid,
             const Kitsunemimi::DataArray &results,
             Kitsunemimi::ErrorContainer &error)
 {
+    // get client
     HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
-    if(client == nullptr) {
+    if(client == nullptr)
+    {
+        error.addMeesage("Failed to get client for connection to shiori");
         return false;
     }
 
-    // fill message
+    // create message
     ResultPush_Message msg;
-    msg.uuid = uuid;
-    msg.name = name;
-    msg.userId = userId;
-    msg.projectId = projectId;
-    msg.results = results.toString();
+    msg.set_uuid(uuid);
+    msg.set_name(name);
+    msg.set_userid(userId);
+    msg.set_projectid(projectId);
+    msg.set_results(results.toString());
 
-    // TODO: variable size
-    uint8_t buffer[1024*1024];
-    const uint64_t size = msg.createBlob(buffer, 1024*1024);
+    // serialize message
+    const uint64_t msgSize = msg.ByteSizeLong();
+    uint8_t* buffer = new uint8_t[msgSize];
+    if(msg.SerializeToArray(buffer, msgSize) == false)
+    {
+        error.addMeesage("Failed to serialize error-message to shiori");
+        delete[] buffer;
+        return false;
+    }
 
-    Kitsunemimi::DataBuffer* ret = client->sendGenericRequest(buffer, size, error);
+    // send message
+    Kitsunemimi::DataBuffer* ret = client->sendGenericRequest(SHIORI_RESULT_PUSH_MESSAGE_TYPE,
+                                                              buffer,
+                                                              msgSize,
+                                                              error);
+    if(ret == nullptr)
+    {
+        error.addMeesage("Failed to send result-message to shiori");
+        delete[] buffer;
+        return false;
+    }
+
     delete ret;
+    delete[] buffer;
 
     return true;
 }
@@ -84,26 +108,45 @@ sendResults(const std::string &uuid,
  *
  * @param userId id of the user where the error belongs to
  * @param errorMessage error-message to send to shiori
+ * @param error reference for error-output
+ *
+ * @return true, if successful, else false
  */
-void
+bool
 sendErrorMessage(const std::string &userId,
-                 const std::string &errorMessage)
+                 const std::string &errorMessage,
+                 Kitsunemimi::ErrorContainer &error)
 {
-    // create message
-    Kitsunemimi::ErrorContainer error;
+    // get client
     HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
-    if(client == nullptr) {
-        return;
+    if(client == nullptr)
+    {
+        error.addMeesage("Failed to get client for connection to shiori");
+        return false;
     }
 
-    Kitsunemimi::Hanami::ErrorLog_Message msg;
-    msg.userId = userId;
-    msg.errorMsg = errorMessage;
-    uint8_t buffer[96*1024];
-    const uint64_t size = msg.createBlob(buffer, 96*1024);
+    // create message
+    ErrorLog_Message msg;
+    msg.set_userid(userId);
+    msg.set_errormsg(errorMessage);
 
-    // send
-    client->sendGenericMessage(buffer, size, error);
+    // serialize message
+    uint8_t buffer[96*1024];
+    const uint64_t msgSize = msg.ByteSizeLong();
+    if(msg.SerializeToArray(buffer, msgSize) == false)
+    {
+        error.addMeesage("Failed to serialize error-message to shiori");
+        return false;
+    }
+
+    // send message
+    if(client->sendGenericMessage(SHIORI_ERROR_LOG_MESSAGE_TYPE, buffer, msgSize, error) == false)
+    {
+        error.addMeesage("Failed to send error-message to shiori");
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -113,16 +156,20 @@ sendErrorMessage(const std::string &userId,
  * @param targetEndpoint accessed endpoint
  * @param userId user-id who made the request to the endpoint
  * @param requestType http-type of the request
+ * @param error reference for error-output
+ *
+ * @return true, if successful, else false
  */
-void
+bool
 sendAuditMessage(const std::string &targetComponent,
                  const std::string &targetEndpoint,
                  const std::string &userId,
-                 const Kitsunemimi::Hanami::HttpRequestType requestType)
+                 const Kitsunemimi::Hanami::HttpRequestType requestType,
+                 Kitsunemimi::ErrorContainer &error)
 {
     // check if shiori is supported
     if(SupportedComponents::getInstance()->support[Kitsunemimi::Hanami::SHIORI] == false) {
-        return;
+        return false;
     }
 
     // convert http-type into string
@@ -143,27 +190,41 @@ sendAuditMessage(const std::string &targetComponent,
         httpType = "PUT";
     }
 
-    // create message
     LOG_DEBUG("process uri: \'" + targetEndpoint + "\' with type '" + httpType + "'");
 
-    // send
-    Kitsunemimi::ErrorContainer error;
+    // get client
     HanamiMessagingClient* client = HanamiMessaging::getInstance()->shioriClient;
-    if(client == nullptr) {
-        return;
+    if(client == nullptr)
+    {
+        error.addMeesage("Failed to get client for connection to shiori");
+        return false;
     }
 
+    // create message
     AuditLog_Message msg;
-    msg.userId = userId;
-    msg.type = httpType;
-    msg.component = targetComponent;
-    msg.endpoint = targetEndpoint;
-    uint8_t buffer[96*1024];
-    const uint64_t size = msg.createBlob(buffer, 96*1024);
+    msg.set_userid(userId);
+    msg.set_type(httpType);
+    msg.set_component(targetComponent);
+    msg.set_endpoint(targetEndpoint);
 
-    if(client->sendGenericMessage(buffer, size, error) == false) {
-        LOG_ERROR(error);
+    // serialize message
+    uint8_t buffer[96*1024];
+    const uint64_t msgSize = msg.ByteSizeLong();
+    if(msg.SerializeToArray(buffer, msgSize) == false)
+    {
+        error.addMeesage("Failed to serialize audit-message to shiori");
+        return false;
     }
+
+    // send message
+    if(client->sendGenericMessage(SHIORI_AUDIT_LOG_MESSAGE_TYPE, buffer, msgSize, error) == false)
+    {
+        error.addMeesage("Failed to send audit-message to shiori");
+        LOG_ERROR(error);
+        return false;
+    }
+
+    return true;
 }
 
 }
