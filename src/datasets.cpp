@@ -21,7 +21,6 @@
  */
 
 #include <libShioriArchive/datasets.h>
-#include <libShioriArchive/shiori_messages.h>
 
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
 #include <libKitsunemimiCrypto/common.h>
@@ -30,6 +29,9 @@
 #include <libKitsunemimiHanamiCommon/structs.h>
 #include <libKitsunemimiHanamiNetwork/hanami_messaging.h>
 #include <libKitsunemimiHanamiNetwork/hanami_messaging_client.h>
+
+#include <../../libKitsunemimiHanamiMessages/protobuffers/shiori_messages.proto3.pb.h>
+#include <../../libKitsunemimiHanamiMessages/message_sub_types.h>
 
 using Kitsunemimi::Hanami::HanamiMessaging;
 using Kitsunemimi::Hanami::HanamiMessagingClient;
@@ -88,12 +90,18 @@ getDatasetData(const std::string &token,
 
     // create real request
     DatasetRequest_Message msg;
-    msg.location = jsonItem.get("location").getString();
-    msg.columnName = columnName;
-    uint8_t buffer[96*1024];
-    const uint64_t size = msg.createBlob(buffer, 96*1024);
+    msg.set_location(jsonItem.get("location").getString());
+    msg.set_columnname(columnName);
 
-    return client->sendGenericRequest(buffer, size, error);
+    uint8_t buffer[96*1024];
+    const uint64_t msgSize = msg.ByteSizeLong();
+    if(msg.SerializeToArray(buffer, msgSize) == false)
+    {
+        error.addMeesage("Failed to serialize error-message to shiori");
+        return nullptr;
+    }
+
+    return client->sendGenericRequest(SHIORI_DATASET_REQUEST_MESSAGE_TYPE, buffer, msgSize, error);
 }
 
 /**

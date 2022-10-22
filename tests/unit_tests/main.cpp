@@ -20,10 +20,7 @@
  *      limitations under the License.
  */
 
-#include <shiori_messages_test.h>
-
 int main()
 {
-    Shiori::HanamiMessages_Test();
     return 0;
 }

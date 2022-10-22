@@ -79,16 +79,14 @@ LIBS += -L../../../libKitsunemimiCommon/src/debug -lKitsunemimiCommon
 LIBS += -L../../../libKitsunemimiCommon/src/release -lKitsunemimiCommon
 INCLUDEPATH += ../../../libKitsunemimiCommon/include
 
-LIBS += -L../../../libKitsunemimiHanamiNetwork/src -lKitsunemimiHanamiMessaging
-LIBS += -L../../../libKitsunemimiHanamiNetwork/src/debug -lKitsunemimiHanamiMessaging
-LIBS += -L../../../libKitsunemimiHanamiNetwork/src/release -lKitsunemimiHanamiMessaging
+LIBS += -L../../../libKitsunemimiHanamiNetwork/src -lKitsunemimiHanamiNetwork
+LIBS += -L../../../libKitsunemimiHanamiNetwork/src/debug -lKitsunemimiHanamiNetwork
+LIBS += -L../../../libKitsunemimiHanamiNetwork/src/release -lKitsunemimiHanamiNetwork
 INCLUDEPATH += ../../../libKitsunemimiHanamiNetwork/include
 
 LIBS += -lssl -lcryptopp -lcrypto
 
 SOURCES += \
-    main.cpp  \
-    shiori_messages_test.cpp
+    main.cpp
 
-HEADERS += \
-    shiori_messages_test.h
+HEADERS +=
