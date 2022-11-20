@@ -46,7 +46,7 @@ bool sendResults(const std::string &uuid,
                  const Kitsunemimi::DataArray &results,
                  Kitsunemimi::ErrorContainer &error);
 
-bool sendErrorMessage(const std::string &userUuid,
+bool sendErrorMessage(const std::string &userId,
                       const std::string &errorMessage,
                       Kitsunemimi::ErrorContainer &error);
 
