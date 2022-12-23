@@ -24,6 +24,7 @@
 
 #include <libKitsunemimiCommon/buffer/data_buffer.h>
 #include <libKitsunemimiCrypto/common.h>
+#include <libKitsunemimiJson/json_item.h>
 
 #include <libKitsunemimiHanamiCommon/component_support.h>
 #include <libKitsunemimiHanamiCommon/structs.h>
