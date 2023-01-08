@@ -31,9 +31,7 @@
 
 namespace Kitsunemimi {
 struct DataBuffer;
-namespace Json {
 class JsonItem;
-}
 }
 
 namespace Shiori
@@ -42,7 +40,7 @@ namespace Shiori
 Kitsunemimi::DataBuffer* getSnapshotData(const std::string &location,
                                          Kitsunemimi::ErrorContainer &error);
 
-bool getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
+bool getSnapshotInformation(Kitsunemimi::JsonItem &result,
                             const std::string &snapshotUuid,
                             const std::string &token,
                             Kitsunemimi::ErrorContainer &error);

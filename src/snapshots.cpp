@@ -84,7 +84,7 @@ getSnapshotData(const std::string &location,
  * @return true, if successful, else false
  */
 bool
-getSnapshotInformation(Kitsunemimi::Json::JsonItem &result,
+getSnapshotInformation(Kitsunemimi::JsonItem &result,
                        const std::string &snapshotUuid,
                        const std::string &token,
                        Kitsunemimi::ErrorContainer &error)
@@ -199,7 +199,7 @@ runSnapshotInitProcess(std::string &fileUuid,
 
     // process response
     LOG_DEBUG("Response from initializing cluster-snapshot: " + response.responseContent);
-    Kitsunemimi::Json::JsonItem parsedResponse;
+    Kitsunemimi::JsonItem parsedResponse;
     if(parsedResponse.parse(response.responseContent, error) == false)
     {
         error.addMeesage("Failed to parse reponse from shiori for the initializing "
@@ -361,7 +361,7 @@ runSnapshotFinalizeProcess(const std::string &snapshotUuid,
 
     // process response
     LOG_DEBUG("Response from finalizing cluster-snapshot: " + response.responseContent);
-    Kitsunemimi::Json::JsonItem parsedResponse;
+    Kitsunemimi::JsonItem parsedResponse;
     if(parsedResponse.parse(response.responseContent, error) == false)
     {
         error.addMeesage("Failed to parse reponse from shiori for the finalizeing "
