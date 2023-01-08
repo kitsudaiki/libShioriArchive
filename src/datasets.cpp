@@ -84,7 +84,7 @@ getDatasetData(const std::string &token,
     }
 
     // parse result
-    Kitsunemimi::Json::JsonItem jsonItem;
+    Kitsunemimi::JsonItem jsonItem;
     if(jsonItem.parse(response.responseContent, error) == false) {
         return nullptr;
     }
@@ -116,7 +116,7 @@ getDatasetData(const std::string &token,
  * @return true, if successful, else false
  */
 bool
-getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
+getDataSetInformation(Kitsunemimi::JsonItem &result,
                       const std::string &dataSetUuid,
                       const std::string &token,
                       Kitsunemimi::ErrorContainer &error)

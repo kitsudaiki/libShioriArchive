@@ -31,9 +31,7 @@
 
 namespace Kitsunemimi {
 struct DataBuffer;
-namespace Json {
 class JsonItem;
-}
 }
 
 namespace Shiori
@@ -44,7 +42,7 @@ Kitsunemimi::DataBuffer* getDatasetData(const std::string &token,
                                         const std::string &columnName,
                                         Kitsunemimi::ErrorContainer &error);
 
-bool getDataSetInformation(Kitsunemimi::Json::JsonItem &result,
+bool getDataSetInformation(Kitsunemimi::JsonItem &result,
                            const std::string &dataSetUuid,
                            const std::string &token,
                            Kitsunemimi::ErrorContainer &error);
